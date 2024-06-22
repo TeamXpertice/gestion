@@ -1,3 +1,3 @@
 <?php
-    require('Controllers/C_verUsuarios.php');
+    require('MVC/index.php');
 ?>
