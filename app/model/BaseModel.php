@@ -1,11 +1,11 @@
 <?php
 
-class Conexion {
+class BaseModel {
     protected $db;
 
     public function __construct() {
         $host = 'localhost';
-        $dbname = 'db_gestion';
+        $dbname = 'gestion';
         $username = 'root';
         $password = '';
 

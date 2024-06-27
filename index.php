@@ -1,3 +1,4 @@
 <?php
-    require('MVC/index.php');
+header('Location: app/view/login/login.php');
+exit();
 ?>
