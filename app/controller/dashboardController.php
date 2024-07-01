@@ -6,9 +6,10 @@ class dashboardController extends BaseController {
     public function showDashboard() {
         session_start();
         if (!isset($_SESSION['username'])) {
-            $this->redirect('loginController.php?action=login');
+            $this->redirect('/gestion/app/view/login/login.php');
         } else {
-            $this->loadView('dashboard/dashboard');
+            $username = $_SESSION['username'];
+            $this->loadView('dashboard.dashboard', ['username' => $username]);
         }
     }
 }

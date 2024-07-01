@@ -8,16 +8,17 @@ class loginController extends BaseController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'];
             $password = $_POST['password'];
-            $login = new Login();
-            if ($login->authenticate($username, $password)) {
+            $user = new Login(); // Asegúrate de que esta clase es la correcta
+            if ($user->authenticate($username, $password)) {
                 session_start();
                 $_SESSION['username'] = $username;
-                $this->redirect('dashboardController.php?action=showDashboard');
+                $this->redirect('/gestion/app/controller/dashboardController.php?action=showDashboard');
             } else {
-                $this->loadView('login/login', ['error' => 'Login fallido.']);
+                $error = "Login fallido.";
+                $this->loadView('login.login', ['error' => $error]);
             }
         } else {
-            $this->loadView('login/login');
+            $this->loadView('login.login');
         }
     }
 }

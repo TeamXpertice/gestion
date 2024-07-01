@@ -1,6 +1,7 @@
 <?php
 session_start();
+session_unset();
 session_destroy();
-header('Location: app/controller/loginController.php?action=login');
-exit();
+header("Location: /gestion/app/view/login/login.php");
+exit;
 ?>
