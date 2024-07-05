@@ -13,5 +13,12 @@ class BaseController {
         header("Location: $url");
         exit;
     }
+
+    protected function checkLogin() {
+        session_start();
+        if (!isset($_SESSION['username'])) {
+            $this->redirect('/gestion/app/view/login/login.php');
+        }
+    }
 }
 ?>

@@ -1,5 +1,7 @@
 <?php
+
 require_once 'BaseModel.php';
+
 class Arsenal extends BaseModel {
     public function getBienes() {
         $stmt = $this->db->query("SELECT * FROM bienes");
@@ -9,6 +11,18 @@ class Arsenal extends BaseModel {
     public function getConsumibles() {
         $stmt = $this->db->query("SELECT * FROM consumibles");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getBienById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM bienes WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getConsumibleById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM consumibles WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function createBien($nombre, $descripcion) {

@@ -8,7 +8,7 @@ class loginController extends BaseController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'];
             $password = $_POST['password'];
-            $user = new Login(); // Asegúrate de que esta clase es la correcta
+            $user = new Login();
             if ($user->authenticate($username, $password)) {
                 session_start();
                 $_SESSION['username'] = $username;

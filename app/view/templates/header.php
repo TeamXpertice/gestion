@@ -28,6 +28,10 @@
         .user-info {
             margin-top: auto;
         }
+        .content {
+            margin-left: 250px; /* Esto asegura que el contenido no esté debajo de la barra lateral */
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -52,4 +56,3 @@
             </div>
         </div>
         <div class="content flex-grow-1">
-            <!-- Aquí irá el contenido de la página -->
