@@ -1,89 +1,156 @@
 <?php
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/model/Arsenal.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/controller/BaseController.php';
+require_once 'BaseController.php';
+require_once __DIR__ . '/../model/Arsenal.php';
 
 class ArsenalController extends BaseController {
-    private $arsenalModel;
+    private $arsenal;
 
     public function __construct() {
+        $this->arsenal = new Arsenal();
         $this->checkLogin();
-        $this->arsenalModel = new Arsenal();
+    }
+
+    public function index() {
+        $bienes = $this->arsenal->getBienes();
+        $consumibles = $this->arsenal->getConsumibles();
+        include __DIR__ . '/../view/arsenal/arsenal.php';
     }
 
     public function showArsenal() {
-        $bienes = $this->arsenalModel->getBienes();
-        $consumibles = $this->arsenalModel->getConsumibles();
-        $username = $_SESSION['username'];
-        $this->loadView('arsenal.arsenal', ['bienes' => $bienes, 'consumibles' => $consumibles, 'username' => $username]);
+        $this->index();
     }
 
     public function createBien() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
-            $descripcion = $_POST['descripcion'];
-            $this->arsenalModel->createBien($nombre, $descripcion);
-            $this->redirect('/gestion/ArsenalController.php?action=showArsenal');
+            $descripcion_bien = $_POST['descripcion_bien'];
+            $nombre_proveedor = $_POST['nombre_proveedor'];
+            $modelo = $_POST['modelo'];
+            $serie_codigo = $_POST['serie_codigo'];
+            $marca = $_POST['marca'];
+            $unidad_medida = $_POST['unidad_medida'];
+            $tamano = $_POST['tamano'];
+            $color = $_POST['color'];
+            $tipo_material = $_POST['tipo_material'];
+            $estado_fisico_actual = $_POST['estado_fisico_actual'];
+            $observacion = $_POST['observacion'];
+    
+            $result = $this->arsenal->createBien(
+                $nombre, $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion
+            );
+    
+            if ($result) {
+                header('Location: /gestion/app/controller/ArsenalController.php?action=index');
+                exit;
+            } else {
+                echo "Failed to create bien.";
+            }
         } else {
-            $this->loadView('arsenal.createBien');
+            include __DIR__ . '/../view/arsenal/createBien.php';
         }
     }
-
+    
+    public function editBien() {
+        $id = $_GET['id'];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nombre = $_POST['nombre'];
+            $descripcion_bien = $_POST['descripcion_bien'];
+            $nombre_proveedor = $_POST['nombre_proveedor'];
+            $modelo = $_POST['modelo'];
+            $serie_codigo = $_POST['serie_codigo'];
+            $marca = $_POST['marca'];
+            $unidad_medida = $_POST['unidad_medida'];
+            $tamano = $_POST['tamano'];
+            $color = $_POST['color'];
+            $tipo_material = $_POST['tipo_material'];
+            $estado_fisico_actual = $_POST['estado_fisico_actual'];
+            $observacion = $_POST['observacion'];
+    
+            $this->arsenal->updateBien(
+                $id, $nombre, $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion
+            );
+    
+            header('Location: /gestion/app/controller/ArsenalController.php?action=index');
+        } else {
+            $bien = $this->arsenal->getBienById($id);
+            include __DIR__ . '/../view/arsenal/editBien.php';
+        }
+    }
     public function createConsumible() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
-            $descripcion = $_POST['descripcion'];
-            $this->arsenalModel->createConsumible($nombre, $descripcion);
-            $this->redirect('/gestion/ArsenalController.php?action=showArsenal');
+            $descripcion_consumible = $_POST['descripcion_consumible'];
+            $nombre_proveedor = $_POST['nombre_proveedor'];
+            $modelo = $_POST['modelo'];
+            $serie_codigo = $_POST['serie_codigo'];
+            $marca = $_POST['marca'];
+            $unidad_medida = $_POST['unidad_medida'];
+            $tamano = $_POST['tamano'];
+            $color = $_POST['color'];
+            $tipo_material = $_POST['tipo_material'];
+            $estado_fisico_actual = $_POST['estado_fisico_actual'];
+            $observacion = $_POST['observacion'];
+            $fecha_vencimiento = $_POST['fecha_vencimiento'];
+            $lote = $_POST['lote'];
+    
+            $result = $this->arsenal->createConsumible(
+                $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote
+            );
+    
+            if ($result) {
+                header('Location: /gestion/app/controller/ArsenalController.php?action=index');
+                exit;
+            } else {
+                echo "Failed to create consumible.";
+            }
         } else {
-            $this->loadView('arsenal.createConsumible');
+            include __DIR__ . '/../view/arsenal/createConsumible.php';
         }
     }
-
-    public function editBien() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
-            $nombre = $_POST['nombre'];
-            $descripcion = $_POST['descripcion'];
-            $this->arsenalModel->updateBien($id, $nombre, $descripcion);
-            $this->redirect('/gestion/ArsenalController.php?action=showArsenal');
-        } else {
-            $id = $_GET['id'];
-            $bien = $this->arsenalModel->getBienById($id);
-            $this->loadView('arsenal.editBien', ['bien' => $bien]);
-        }
-    }
-
+    
     public function editConsumible() {
+        $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
             $nombre = $_POST['nombre'];
-            $descripcion = $_POST['descripcion'];
-            $this->arsenalModel->updateConsumible($id, $nombre, $descripcion);
-            $this->redirect('/gestion/ArsenalController.php?action=showArsenal');
+            $descripcion_consumible = $_POST['descripcion_consumible'];
+            $nombre_proveedor = $_POST['nombre_proveedor'];
+            $modelo = $_POST['modelo'];
+            $serie_codigo = $_POST['serie_codigo'];
+            $marca = $_POST['marca'];
+            $unidad_medida = $_POST['unidad_medida'];
+            $tamano = $_POST['tamano'];
+            $color = $_POST['color'];
+            $tipo_material = $_POST['tipo_material'];
+            $estado_fisico_actual = $_POST['estado_fisico_actual'];
+            $observacion = $_POST['observacion'];
+            $fecha_vencimiento = $_POST['fecha_vencimiento'];
+            $lote = $_POST['lote'];
+    
+            $this->arsenal->updateConsumible(
+                $id, $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote
+            );
+    
+            header('Location: /gestion/app/controller/ArsenalController.php?action=index');
         } else {
-            $id = $_GET['id'];
-            $consumible = $this->arsenalModel->getConsumibleById($id);
-            $this->loadView('arsenal.editConsumible', ['consumible' => $consumible]);
+            $consumible = $this->arsenal->getConsumibleById($id);
+            include __DIR__ . '/../view/arsenal/editConsumible.php';
         }
     }
-
+    
     public function deleteBien() {
         $id = $_GET['id'];
-        $this->arsenalModel->deleteBien($id);
-        $this->redirect('/gestion/ArsenalController.php?action=showArsenal');
+        $this->arsenal->deleteBien($id);
+        header('Location: /gestion/app/controller/ArsenalController.php?action=index');
     }
 
     public function deleteConsumible() {
         $id = $_GET['id'];
-        $this->arsenalModel->deleteConsumible($id);
-        $this->redirect('/gestion/ArsenalController.php?action=showArsenal');
+        $this->arsenal->deleteConsumible($id);
+        header('Location: /gestion/app/controller/ArsenalController.php?action=index');
     }
 }
 
-if (isset($_GET['action'])) {
-    $controller = new ArsenalController();
-    $action = $_GET['action'];
-    $controller->$action();
-}
+$action = $_GET['action'] ?? 'index';
+$controller = new ArsenalController();
+$controller->$action();
 ?>
