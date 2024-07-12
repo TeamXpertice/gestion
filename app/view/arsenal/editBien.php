@@ -11,13 +11,59 @@
     <div class="container mt-5">
         <h1>Editar Bien</h1>
         <form action="/gestion/app/controller/ArsenalController.php?action=editBien&id=<?php echo htmlspecialchars($bien['id']); ?>" method="post">
-            <div class="form-group">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" class="form-control" value="<?php echo htmlspecialchars($bien['nombre']); ?>" required>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" value="<?php echo htmlspecialchars($bien['nombre']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="nombre_proveedor">Nombre del Proveedor:</label>
+                    <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="form-control" value="<?php echo htmlspecialchars($bien['nombre_proveedor']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="modelo">Modelo:</label>
+                    <input type="text" id="modelo" name="modelo" class="form-control" value="<?php echo htmlspecialchars($bien['modelo']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="serie_codigo">Serie/Código:</label>
+                    <input type="text" id="serie_codigo" name="serie_codigo" class="form-control" value="<?php echo htmlspecialchars($bien['serie_codigo']); ?>" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="marca">Marca:</label>
+                    <input type="text" id="marca" name="marca" class="form-control" value="<?php echo htmlspecialchars($bien['marca']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="unidad_medida">Unidad de Medida:</label>
+                    <input type="text" id="unidad_medida" name="unidad_medida" class="form-control" value="<?php echo htmlspecialchars($bien['unidad_medida']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="tamano">Tamaño:</label>
+                    <input type="text" id="tamano" name="tamano" class="form-control" value="<?php echo htmlspecialchars($bien['tamano']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="color">Color:</label>
+                    <input type="text" id="color" name="color" class="form-control" value="<?php echo htmlspecialchars($bien['color']); ?>" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="tipo_material">Tipo de Material:</label>
+                    <input type="text" id="tipo_material" name="tipo_material" class="form-control" value="<?php echo htmlspecialchars($bien['tipo_material']); ?>" required>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="estado_fisico_actual">Estado Físico Actual:</label>
+                    <input type="text" id="estado_fisico_actual" name="estado_fisico_actual" class="form-control" value="<?php echo htmlspecialchars($bien['estado_fisico_actual']); ?>" required>
+                </div>
             </div>
             <div class="form-group">
-                <label for="descripcion">Descripción:</label>
-                <textarea id="descripcion" name="descripcion" class="form-control" required><?php echo htmlspecialchars($bien['descripcion']); ?></textarea>
+                <label for="descripcion_bien">Descripción:</label>
+                <textarea id="descripcion_bien" name="descripcion_bien" class="form-control" required><?php echo htmlspecialchars($bien['descripcion_bien']); ?></textarea>
+            </div>
+            <div class="form-group">
+                <label for="observacion">Observación:</label>
+                <textarea id="observacion" name="observacion" class="form-control" required><?php echo htmlspecialchars($bien['observacion']); ?></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Guardar cambios</button>
         </form>
