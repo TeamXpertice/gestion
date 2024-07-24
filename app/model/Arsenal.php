@@ -2,6 +2,7 @@
 require_once 'BaseModel.php';
 
 class Arsenal extends BaseModel {
+    
     public function getBienes() {
         $stmt = $this->db->query("SELECT * FROM bienes");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

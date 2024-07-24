@@ -1,24 +1,26 @@
 <?php
 
-include 'BaseController.php';
-include '../model/login.php';
+require_once 'BaseController.php';
+require_once __DIR__ . '/../model/login.php';
 
 class loginController extends BaseController {
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'];
             $password = $_POST['password'];
-            $user = new Login();
-            if ($user->authenticate($username, $password)) {
+            
+            $loginModel = new login();
+            $user = $loginModel->authenticate($username, $password);
+
+            if ($user) {
                 session_start();
                 $_SESSION['username'] = $username;
-                $this->redirect('/gestion/app/controller/dashboardController.php?action=showDashboard');
+                header('Location: /gestion/app/controller/dashboardController.php?action=showDashboard');
+                exit();
             } else {
-                $error = "Login fallido.";
-                $this->loadView('login.login', ['error' => $error]);
+                header('Location: /gestion/app/view/login/login.php?error=invalid_credentials');
+                exit();
             }
-        } else {
-            $this->loadView('login.login');
         }
     }
 }

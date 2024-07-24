@@ -6,7 +6,8 @@
     <title>Sistema</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
-    <style>
+</head>
+<style>
         .sidebar {
             height: 100vh;
             position: fixed;
@@ -29,27 +30,34 @@
             margin-top: auto;
         }
         .content {
-            margin-left: 250px; /* Esto asegura que el contenido no esté debajo de la barra lateral */
+            margin-left: 250px; 
             padding: 20px;
         }
+        .dropdown .dropdown-menu {
+    background: #333; 
+    color: #ffffff; 
+}
     </style>
-</head>
 <body>
     <div class="d-flex">
         <div class="sidebar d-flex flex-column">
             <div class="text-center mb-4">
                 <img src="/gestion/public/img/logo.png" alt="Icono" class="img-fluid mb-3" style="width: 100px;">
                 <h4>Bienvenido</h4>
-                <p>Usuario: <strong><?php echo isset($username) ? htmlspecialchars($username) : 'Invitado'; ?></strong></p>
+                <p>Usuario: <strong><?php echo htmlspecialchars($username ?? 'Invitado'); ?></strong></p>
             </div>
             <nav class="nav flex-column">
                 <div class="nav-item">
                     <a href="/gestion/app/controller/dashboardController.php?action=showDashboard">Dashboard</a>
                 </div>
-                <div class="nav-item">
-                    <a href="/gestion/app/controller/ArsenalController.php?action=showArsenal">Arsenal</a>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="arsenalDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Arsenal</a>
+                    <div class="dropdown-menu" aria-labelledby="arsenalDropdown">
+                        <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showArsenal">Ver arsenal</a>
+                        <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showBien">Bienes</a>
+                        <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showConsumible">Consumibles</a>
+                    </div>
                 </div>
-                <!-- Agrega más enlaces aquí según sea necesario -->
             </nav>
             <div class="user-info mt-auto text-center">
                 <a href="/gestion/app/controller/logoutController.php" class="btn btn-danger">Cerrar Sesión</a>

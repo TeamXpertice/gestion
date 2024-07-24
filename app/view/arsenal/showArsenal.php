@@ -6,57 +6,10 @@
     <title>Arsenal</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
-    <style>
-        .sidebar {
-            height: 100vh;
-            position: fixed;
-            width: 250px;
-            background-color: #343a40;
-            color: white;
-            padding: 20px;
-        }
-        .sidebar .nav-item a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px 0;
-        }
-        .sidebar .nav-item a:hover {
-            background-color: #495057;
-            border-radius: 5px;
-        }
-        .user-info {
-            margin-top: auto;
-        }
-        .content {
-            margin-left: 250px; 
-            padding: 20px;
-        }
-    </style>
+
 </head>
 <body>
-    <div class="d-flex">
-        <div class="sidebar d-flex flex-column">
-            <div class="text-center mb-4">
-                <img src="/gestion/public/img/logo.png" alt="Icono" class="img-fluid mb-3" style="width: 100px;">
-                <h4>Bienvenido</h4>
-                <p>Usuario: <strong><?php echo isset($username) ? htmlspecialchars($username) : 'Invitado'; ?></strong></p>
-            </div>
-            <nav class="nav flex-column">
-                <div class="nav-item">
-                    <a href="/gestion/app/controller/dashboardController.php?action=showDashboard">Dashboard</a>
-                </div>
-                <div class="nav-item">
-                    <a href="/gestion/app/controller/ArsenalController.php?action=showArsenal">Arsenal</a>
-                </div>
-            </nav>
-            <div class="user-info mt-auto text-center">
-                <a href="/gestion/app/controller/logoutController.php" class="btn btn-danger">Cerrar Sesión</a>
-            </div>
-        </div>
-        
-        <div class="content flex-grow-1">
-            <div class="container mt-5">
+            <div class="container mt-1">
                 <h1>Arsenal</h1>
                 <h2>Bienes</h2>
                 <a href="/gestion/app/controller/ArsenalController.php?action=createBien" class="btn btn-primary mb-3">Agregar Bien</a>
@@ -151,8 +104,9 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

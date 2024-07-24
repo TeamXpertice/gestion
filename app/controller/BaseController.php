@@ -1,24 +1,19 @@
 <?php
-
 class BaseController {
-    protected function loadView($view, $data = []) {
-        extract($data);
-        $viewPath = str_replace('.', '/', $view);
-        include $_SERVER['DOCUMENT_ROOT'] . "/gestion/app/view/templates/header.php";
-        include $_SERVER['DOCUMENT_ROOT'] . "/gestion/app/view/{$viewPath}.php";
-        include $_SERVER['DOCUMENT_ROOT'] . "/gestion/app/view/templates/footer.php";
-    }
-
-    protected function redirect($url) {
-        header("Location: $url");
-        exit;
-    }
-
     protected function checkLogin() {
         session_start();
         if (!isset($_SESSION['username'])) {
-            $this->redirect('/gestion/app/view/login/login.php');
+            header('Location: /gestion/app/view/login/login.php');
+            exit();
         }
+        return $_SESSION['username'];
+    }
+
+    protected function loadView($view, $data = []) {
+        extract($data);
+        include __DIR__ . '/../view/templates/header.php';
+        include __DIR__ . '/../view/' . str_replace('.', '/', $view) . '.php';
+        include __DIR__ . '/../view/templates/footer.php';
     }
 }
 ?>
