@@ -12,7 +12,9 @@ class BaseController {
     protected function loadView($view, $data = []) {
         extract($data);
         include __DIR__ . '/../view/templates/header.php';
-        include __DIR__ . '/../view/' . str_replace('.', '/', $view) . '.php';
+        $viewPath = __DIR__ . '/../view/' . str_replace('.', '/', $view) . '.php';
+        //var_dump($viewPath); 
+        include $viewPath;
         include __DIR__ . '/../view/templates/footer.php';
     }
 }

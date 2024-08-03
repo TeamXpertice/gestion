@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +18,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container mt-5">
         <h1>Agregar Consumible</h1>
@@ -29,7 +27,6 @@
                     <label for="nombre">Nombre*:</label>
                     <input type="text" id="nombre" name="nombre" class="form-control" required>
                 </div>
-
                 <div class="form-group col-md-4">
                     <label for="nombre_proveedor">Nombre del proveedor*:</label>
                     <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="form-control" required>
@@ -55,7 +52,7 @@
                     <input type="text" id="unidad_medida" name="unidad_medida" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="tamano">tamano*:</label>
+                    <label for="tamano">Tamaño*:</label>
                     <input type="text" id="tamano" name="tamano" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
@@ -64,10 +61,26 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="tipo_material">Tipo de material*:</label>
-                    <input type="text" id="tipo_material" name="tipo_material" class="form-control" required>
-                </div>
+                <?php if (isset($categorias) && is_array($categorias)): ?>
+                    <div class="form-group">
+                        
+                        <label for="categorias">Categorías:</label><br>
+                        <?php foreach ($categorias as $categoria): ?>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="categorias[]" value="<?php echo htmlspecialchars($categoria['id']); ?>" 
+                                <?php if (isset($consumibleCategorias) && in_array($categoria['id'], $consumibleCategorias)) echo 'checked'; ?>>
+                                <label class="form-check-label"><?php echo htmlspecialchars($categoria['nombre']); ?></label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p>No se encontraron categorías.</p>
+                <?php endif; ?>
+                <div class="form-group mt-3">
+                        <label for="nueva_categoria">Agregar nueva categoría:</label>
+                        <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
+                        <button type="button" id="agregar_categoria" class="btn btn-secondary mt-2">Agregar</button>
+                    </div>
 
                 <div class="form-group col-md-4">
                     <label for="estado_fisico_actual">Estado físico del consumible*:</label>
@@ -98,6 +111,27 @@
         </form>
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
+    <script>
+$(document).ready(function() {
+    $('#agregar_categoria').click(function() {
+        var nuevaCategoria = $('#nueva_categoria').val();
+        if (nuevaCategoria.trim() !== '') {
+            $.post('/gestion/app/controller/ArsenalController.php?action=addCategoria', { nombre: nuevaCategoria }, function(response) {
+                if (response.success) {
+                    var newId = response.id;
+                    var newCategoria = `<div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="categorias[]" value="${newId}" checked>
+                        <label class="form-check-label">${nuevaCategoria}</label>
+                    </div>`;
+                    $('#categorias').append(newCategoria);
+                    $('#nueva_categoria').val('');
+                } else {
+                    alert('Error al agregar la categoría.');
+                }
+            }, 'json');
+        }
+    });
+});
+    </script>
 </body>
-
 </html>

@@ -6,6 +6,9 @@
     <title>Arsenal</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
+        <!-- data table -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
 
 </head>
 <body>
@@ -20,12 +23,11 @@
                             <th>Modelo</th>
                             <th>Serie/Código</th>
                             <th>Marca</th>
-                            <th>Unidad de Medida</th>
-                            <th>Tamaño</th>
+                           
                             <th>Color</th>
-                            <th>Tipo de Material</th>
+                            
                             <th>Estado Físicol</th>
-                            <th>Descripción</th>
+                            
                             <th>Observación</th>
                             <th>Acciones</th>
                         </tr>
@@ -39,12 +41,8 @@
                             <td><?php echo htmlspecialchars($bien['modelo']); ?></td>
                             <td><?php echo htmlspecialchars($bien['serie_codigo']); ?></td>
                             <td><?php echo htmlspecialchars($bien['marca']); ?></td>
-                            <td><?php echo htmlspecialchars($bien['unidad_medida']); ?></td>
-                            <td><?php echo htmlspecialchars($bien['tamano']); ?></td>
                             <td><?php echo htmlspecialchars($bien['color']); ?></td>
-                            <td><?php echo htmlspecialchars($bien['tipo_material']); ?></td>
                             <td><?php echo htmlspecialchars($bien['estado_fisico_actual']); ?></td>
-                            <td><?php echo htmlspecialchars($bien['descripcion_bien']); ?></td>
                             <td><?php echo htmlspecialchars($bien['observacion']); ?></td>
                             <td>
                                 <a href="/gestion/app/controller/ArsenalController.php?action=editBien&id=<?php echo $bien['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
@@ -55,9 +53,25 @@
                     </tbody>
                 </table>
                 </div>
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
+                <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#consumiblesTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'csv', 'excel', 'pdf'
+                ]
+            });
+        });
+    </script>
 </body>
 </html>

@@ -6,6 +6,9 @@
     <title>Sistema</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
+    <!-- data table -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
 </head>
 <style>
         .sidebar {
@@ -54,6 +57,8 @@
                     <a class="nav-link dropdown-toggle" href="#" id="arsenalDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Arsenal</a>
                     <div class="dropdown-menu" aria-labelledby="arsenalDropdown">
                         <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showArsenal">Ver arsenal</a>
+                        <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showVentaConsumible">Ventas de Consumibles</a>
+                        <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showVentasRegistradas">Ver Ventas Registradas</a>
                         <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showBien">Bienes</a>
                         <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showConsumible">Consumibles</a>
                     </div>
@@ -64,3 +69,5 @@
             </div>
         </div>
         <div class="content flex-grow-1">
+        </div>
+        </div>
