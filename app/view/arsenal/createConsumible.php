@@ -61,14 +61,12 @@
                 </div>
             </div>
             <div class="form-row">
-                <?php if (isset($categorias) && is_array($categorias)): ?>
-                    <div class="form-group">
-                        
+            <?php if (isset($categorias) && is_array($categorias)): ?>
+                    <div class="form-group col-md-12" id="categorias">
                         <label for="categorias">Categorías:</label><br>
                         <?php foreach ($categorias as $categoria): ?>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="categorias[]" value="<?php echo htmlspecialchars($categoria['id']); ?>" 
-                                <?php if (isset($consumibleCategorias) && in_array($categoria['id'], $consumibleCategorias)) echo 'checked'; ?>>
+                                <input type="checkbox" class="form-check-input" name="categorias[]" value="<?php echo htmlspecialchars($categoria['id']); ?>">
                                 <label class="form-check-label"><?php echo htmlspecialchars($categoria['nombre']); ?></label>
                             </div>
                         <?php endforeach; ?>
@@ -76,11 +74,12 @@
                 <?php else: ?>
                     <p>No se encontraron categorías.</p>
                 <?php endif; ?>
-                <div class="form-group mt-3">
-                        <label for="nueva_categoria">Agregar nueva categoría:</label>
-                        <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
-                        <button type="button" id="agregar_categoria" class="btn btn-secondary mt-2">Agregar</button>
-                    </div>
+                <div class="form-group col-md-12 mt-3">
+                    <label for="nueva_categoria">Agregar nueva categoría:</label>
+                    <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
+                    <button type="button" id="agregar_categoria" class="btn btn-secondary mt-2">Agregar</button>
+                </div>
+
 
                 <div class="form-group col-md-4">
                     <label for="estado_fisico_actual">Estado físico del consumible*:</label>
@@ -132,6 +131,7 @@ $(document).ready(function() {
         }
     });
 });
+
     </script>
 </body>
 </html>

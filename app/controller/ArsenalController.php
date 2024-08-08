@@ -1,24 +1,16 @@
 <?php
 require_once 'BaseController.php';
 require_once __DIR__ . '/../model/Arsenal.php';
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 class ArsenalController extends BaseController {
     private $model;
 
     public function __construct() {
         $this->model = new Arsenal();
     }
-    public function addCategoria() {
-        $nombre = $_POST['nombre'];
-        if (!empty($nombre)) {
-            $id = $this->model->addCategoria($nombre);
-            if ($id) {
-                echo json_encode(['success' => true, 'id' => $id]);
-            } else {
-                echo json_encode(['success' => false]);
-            }
-        }
-    }
+
     public function showArsenal() {
         $bienes = $this->model->getBienes();
         $consumibles = $this->model->getConsumibles();
@@ -58,17 +50,23 @@ class ArsenalController extends BaseController {
         ]);
     }
     public function getConsumiblesPorCategoria() {
-        if (isset($_GET['categoria_id'])) {
-            $categoriaId = (int) $_GET['categoria_id'];
-            $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
     
+        if (isset($_GET['categoria_id'])) {
+            $categoria_id = $_GET['categoria_id'];
+            $consumibles = $this->model->getConsumiblesPorCategoria($categoria_id);
+            
             header('Content-Type: application/json');
             echo json_encode($consumibles);
         } else {
-            header('Content-Type: application/json');
-            echo json_encode([]);
+            http_response_code(400);
+            echo json_encode(['error' => 'Categoria ID no proporcionado.']);
         }
     }
+    
+    
     
     
     
@@ -158,9 +156,21 @@ class ArsenalController extends BaseController {
             $this->loadView('arsenal.editBien', ['bien' => $bien]);
         }
     }
-
+    public function addCategoria() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nombre = $_POST['nombre'];
+            $categoriaId = $this->model->addCategoria($nombre);
+    
+            if ($categoriaId) {
+                echo json_encode(['success' => true, 'id' => $categoriaId]);
+            } else {
+                echo json_encode(['success' => false]);
+            }
+        }
+    }
     public function createConsumible() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Recoge los datos del formulario
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
             $nombre_proveedor = $_POST['nombre_proveedor'];
@@ -188,13 +198,12 @@ class ArsenalController extends BaseController {
                 echo "Failed to create consumible.";
             }
         } else {
+            // Carga las categorías para mostrarlas en el formulario
             $categorias = $this->model->getAllCategorias(); 
             $this->loadView('arsenal.createConsumible', ['categorias' => $categorias]);
         }
     }
     
-    
-
     public function editConsumible() {
         $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -225,6 +234,7 @@ class ArsenalController extends BaseController {
         }
     }
 
+    
     public function deleteBien() {
         $id = $_GET['id'];
         $this->model->deleteBien($id);

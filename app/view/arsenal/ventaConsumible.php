@@ -52,11 +52,9 @@
                             endif;
                     ?>
                             <div class="col-<?php echo $colWidth; ?>">
-                            <button type="button" class="category-button category-<?php echo $colorClass; ?>" onclick="mostrarConsumiblesPorCategoria(<?php echo $categoria['id']; ?>)">
-                                <?php echo htmlspecialchars($categoria['nombre']); ?>
-                            </button>
-
-
+                                <button type="button" class="category-button category-<?php echo $colorClass; ?>" onclick="mostrarConsumiblesPorCategoria(<?php echo $categoria['id']; ?>)">
+                                    <?php echo htmlspecialchars($categoria['nombre']); ?>
+                                </button>
                             </div>
                     <?php 
                         endforeach;
@@ -88,22 +86,31 @@
     <script>
         var productosSeleccionados = [];
 
-        function mostrarConsumibles(categoria) {
+        function mostrarConsumiblesPorCategoria(categoriaId) {
             $.ajax({
                 url: '/gestion/app/controller/ArsenalController.php',
                 type: 'GET',
                 data: {
-                    action: 'getConsumiblesPorTipo',
-                    categoria: categoria
+                    action: 'getConsumiblesPorCategoria',
+                    categoria_id: categoriaId
                 },
                 success: function(response) {
-                    var consumibles = JSON.parse(response);
-                    var html = '<table class="table table-bordered"><thead class="thead-dark"><tr><th>Nombre</th><th>Stock</th><th>Precio</th><th>Acción</th></tr></thead><tbody>';
-                    consumibles.forEach(function(consumible) {
-                        html += '<tr><td>' + consumible.nombre + '</td><td>' + consumible.stock + '</td><td>' + consumible.precio + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.precio + ')">Agregar</button></td></tr>';
-                    });
-                    html += '</tbody></table>';
-                    $('#consumiblesList').html(html);
+                    try {
+                        var consumibles = JSON.parse(response);
+                        var html = '<table class="table table-bordered"><thead class="thead-dark"><tr><th>Nombre</th><th>Stock</th><th>Precio</th><th>Acción</th></tr></thead><tbody>';
+                        consumibles.forEach(function(consumible) {
+                            html += '<tr><td>' + consumible.nombre + '</td><td>' + consumible.stock + '</td><td>' + consumible.precio.toFixed(2) + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.precio.toFixed(2) + ')">Agregar</button></td></tr>';
+                        });
+                        html += '</tbody></table>';
+                        $('#consumiblesList').html(html);
+                    } catch (e) {
+                        console.error('Error parsing JSON response:', e);
+                        $('#consumiblesList').html('<p>Error al cargar los consumibles.</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                    $('#consumiblesList').html('<p>Error al cargar los consumibles.</p>');
                 }
             });
         }
@@ -117,7 +124,7 @@
             if (productosSeleccionados.length > 0) {
                 var html = '<ul class="list-group">';
                 productosSeleccionados.forEach(function(producto) {
-                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">' + producto.nombre + '<span class="badge badge-primary badge-pill">$' + producto.precio + '</span></li>';
+                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">' + producto.nombre + '<span class="badge badge-primary badge-pill">$' + producto.precio.toFixed(2) + '</span></li>';
                 });
                 html += '</ul>';
             } else {
@@ -126,37 +133,6 @@
             $('#ventaPreview').html(html);
             $('#productosSeleccionados').val(JSON.stringify(productosSeleccionados));
         }
-        function mostrarConsumiblesPorCategoria(categoriaId) {
-    $.ajax({
-        url: '/gestion/app/controller/ArsenalController.php',
-        type: 'GET',
-        data: {
-            action: 'getConsumiblesPorCategoria',
-            categoria_id: categoriaId
-        },
-        success: function(response) {
-            try {
-                var consumibles = JSON.parse(response);
-                var html = '<table class="table table-bordered"><thead class="thead-dark"><tr><th>Nombre</th><th>Stock</th><th>Precio</th><th>Acción</th></tr></thead><tbody>';
-                consumibles.forEach(function(consumible) {
-                    html += '<tr><td>' + consumible.nombre + '</td><td>' + consumible.stock + '</td><td>' + consumible.precio + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.precio + ')">Agregar</button></td></tr>';
-                });
-                html += '</tbody></table>';
-                $('#consumiblesList').html(html);
-            } catch (e) {
-                console.error('Error parsing JSON response:', e);
-                $('#consumiblesList').html('<p>Error al cargar los consumibles.</p>');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', status, error);
-            $('#consumiblesList').html('<p>Error al cargar los consumibles.</p>');
-        }
-    });
-}
-
-
     </script>
-    
 </body>
 </html>

@@ -22,12 +22,7 @@ class Arsenal extends BaseModel {
         $stmt = $this->db->query("SELECT * FROM ventas");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function addCategoria($nombre) {
-        $sql = "INSERT INTO categorias (nombre) VALUES (:nombre)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':nombre' => $nombre]);
-        return $this->db->lastInsertId();
-    }
+
     
     public function showVentaConsumible($id) {
         $consumible = $this->getConsumibleById($id);
@@ -45,13 +40,20 @@ class Arsenal extends BaseModel {
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getConsumiblesPorCategoria($categoriaId) {
-        $sql = "SELECT * FROM consumibles WHERE categoria_id = :categoria_id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':categoria_id', $categoriaId, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function getConsumiblesPorCategoria($categoria_id) {
+        try {
+            $sql = "SELECT id, nombre, stock, precio FROM consumibles WHERE categoria_id = :categoria_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en getConsumiblesPorCategoria: ' . $e->getMessage());
+            return [];
+        }
     }
+    
+    
     
     public function createVentaConsumible($idConsumible, $cantidad) {
         $consumible = $this->getConsumibleById($idConsumible);
@@ -164,12 +166,37 @@ class Arsenal extends BaseModel {
                 ':lote' => $lote
             ]);
     
-            return true; 
+            return $this->db->lastInsertId(); 
         } catch (PDOException $e) {
             echo "Error al insertar el consumible: " . $e->getMessage();
             return false; 
         }
     }
+    
+    public function assignCategoriasToConsumible($consumibleId, $categorias) {
+        try {
+            $this->db->beginTransaction();
+    
+            // Elimina las categorías actuales del consumible
+            $sql = "DELETE FROM consumibles_categorias WHERE consumible_id = :consumible_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':consumible_id' => $consumibleId]);
+    
+            // Inserta las nuevas categorías
+            $sql = "INSERT INTO consumibles_categorias (consumible_id, categoria_id) VALUES (:consumible_id, :categoria_id)";
+            $stmt = $this->db->prepare($sql);
+    
+            foreach ($categorias as $categoriaId) {
+                $stmt->execute([':consumible_id' => $consumibleId, ':categoria_id' => $categoriaId]);
+            }
+    
+            $this->db->commit();
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            echo "Error al asignar categorías al consumible: " . $e->getMessage();
+        }
+    }
+
     
     public function updateConsumible($id, $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote) {
         $sql = "UPDATE consumibles SET 
@@ -206,37 +233,22 @@ class Arsenal extends BaseModel {
         ]);
     }
     
-    public function assignCategoriasToConsumible($consumibleId, $categorias) {
-        try {
-            $this->db->beginTransaction();
-    
-            // Delete existing categories for the consumible
-            $sql = "DELETE FROM consumibles_categorias WHERE consumible_id = :consumible_id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':consumible_id' => $consumibleId]);
-    
-            // Insert new categories
-            $sql = "INSERT INTO consumibles_categorias (consumible_id, categoria_id) VALUES (:consumible_id, :categoria_id)";
-            $stmt = $this->db->prepare($sql);
-            foreach ($categorias as $categoriaId) {
-                $stmt->execute([
-                    ':consumible_id' => $consumibleId,
-                    ':categoria_id' => $categoriaId
-                ]);
-            }
-    
-            $this->db->commit();
-            return true;
-        } catch (PDOException $e) {
-            $this->db->rollBack();
-            echo "Error al asignar categorías al consumible: " . $e->getMessage();
-            return false;
-        }
-    }
-    
+
 
 public function getLastInsertId() {
     return $this->db->lastInsertId();
+}
+public function addCategoria($nombre) {
+    try {
+        $sql = "INSERT INTO categorias (nombre) VALUES (:nombre)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':nombre' => $nombre]);
+
+        return $this->db->lastInsertId(); 
+    } catch (PDOException $e) {
+        echo "Error al agregar la categoría: " . $e->getMessage();
+        return false; 
+    }
 }
     public function deleteBien($id) {
         $sql = "DELETE FROM bienes WHERE id = :id";
