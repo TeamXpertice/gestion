@@ -40,17 +40,26 @@ class Arsenal extends BaseModel {
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getConsumiblesPorCategoria($categoria_id) {
+    public function getConsumiblesPorCategoria($categoriaId) {
         try {
-            $sql = "SELECT id, nombre, stock, precio FROM consumibles WHERE categoria_id = :categoria_id";
+            $sql = "SELECT c.id, c.nombre, c.stock, c.precio 
+                    FROM consumibles c
+                    INNER JOIN consumibles_categorias cc ON c.id = cc.consumible_id
+                    WHERE cc.categoria_id = :categoria_id";
+            
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
-            $stmt->execute();
+            $stmt->execute([':categoria_id' => $categoriaId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log('Error en getConsumiblesPorCategoria: ' . $e->getMessage());
-            return [];
+            error_log("Error fetching consumibles by category: " . $e->getMessage());
+            return []; 
         }
+    }
+    public function getVentasPorFecha($fecha) {
+        $stmt = $this->db->prepare("SELECT * FROM ventas WHERE fecha = :fecha");
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     
@@ -78,7 +87,48 @@ class Arsenal extends BaseModel {
             return false;
         }
     }
-
+    public function insertVenta($total) {
+        $sql = "INSERT INTO ventas (total, fecha) VALUES (:total, CURDATE())";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':total', $total, PDO::PARAM_STR);
+    
+        if ($stmt->execute()) {
+            return $this->db->lastInsertId();
+        } else {
+            return false;
+        }
+    }
+    public function insertVentaDetalle($ventaId, $consumibleId, $cantidad, $precioUnitario) {
+        $sql = "INSERT INTO ventas_detalles (venta_id, consumible_id, cantidad, precio_unitario) 
+                VALUES (:venta_id, :consumible_id, :cantidad, :precio_unitario)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':venta_id', $ventaId, PDO::PARAM_INT);
+        $stmt->bindParam(':consumible_id', $consumibleId, PDO::PARAM_INT);
+        $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+        $stmt->bindParam(':precio_unitario', $precioUnitario, PDO::PARAM_STR);
+    
+        return $stmt->execute();
+    }
+    
+    public function getStockConsumible($consumibleId) {
+        $sql = "SELECT stock FROM consumibles WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $consumibleId, PDO::PARAM_INT);
+        $stmt->execute();
+    
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['stock'] : 0;
+    }
+    public function updateStockConsumible($consumibleId, $nuevoStock) {
+        $sql = "UPDATE consumibles SET stock = :stock WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':stock', $nuevoStock, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $consumibleId, PDO::PARAM_INT);
+    
+        return $stmt->execute();
+    }
+    
+    
     public function createBien($nombre, $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion) {
         try {
             $sql = "INSERT INTO bienes 
@@ -142,12 +192,12 @@ class Arsenal extends BaseModel {
         ]);
     }
     
-    public function createConsumible($nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote) {
+    public function createConsumible($nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote, $precio, $stock) {
         try {
             $sql = "INSERT INTO consumibles 
-                    (nombre, descripcion_consumible, nombre_proveedor, modelo, serie_codigo, marca, unidad_medida, tamano, color, estado_fisico_actual, observacion, fecha_vencimiento, lote) 
+                    (nombre, descripcion_consumible, nombre_proveedor, modelo, serie_codigo, marca, unidad_medida, tamano, color, estado_fisico_actual, observacion, fecha_vencimiento, lote, precio, stock) 
                     VALUES 
-                    (:nombre, :descripcion_consumible, :nombre_proveedor, :modelo, :serie_codigo, :marca, :unidad_medida, :tamano, :color, :estado_fisico_actual, :observacion, :fecha_vencimiento, :lote)";
+                    (:nombre, :descripcion_consumible, :nombre_proveedor, :modelo, :serie_codigo, :marca, :unidad_medida, :tamano, :color, :estado_fisico_actual, :observacion, :fecha_vencimiento, :lote, :precio, :stock)";
             
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
@@ -163,15 +213,19 @@ class Arsenal extends BaseModel {
                 ':estado_fisico_actual' => $estado_fisico_actual,
                 ':observacion' => $observacion,
                 ':fecha_vencimiento' => $fecha_vencimiento,
-                ':lote' => $lote
+                ':lote' => $lote,
+                ':precio' => $precio,  
+                ':stock' => $stock    
             ]);
     
             return $this->db->lastInsertId(); 
         } catch (PDOException $e) {
-            echo "Error al insertar el consumible: " . $e->getMessage();
+            error_log("Error inserting consumible: " . $e->getMessage());
             return false; 
         }
     }
+    
+    
     
     public function assignCategoriasToConsumible($consumibleId, $categorias) {
         try {

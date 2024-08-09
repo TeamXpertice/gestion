@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-08-2024 a las 15:29:04
+-- Tiempo de generación: 09-08-2024 a las 22:56:27
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -67,7 +67,11 @@ CREATE TABLE `categorias` (
 --
 
 INSERT INTO `categorias` (`id`, `nombre`) VALUES
-(2, 'Galleta');
+(1, 'Electrónicos'),
+(2, 'Papel'),
+(3, 'Alimentos'),
+(4, 'Galleta'),
+(5, 'prueba1');
 
 -- --------------------------------------------------------
 
@@ -101,34 +105,36 @@ CREATE TABLE `consumibles` (
   `observacion` text DEFAULT NULL,
   `fecha_vencimiento` date DEFAULT NULL,
   `lote` varchar(255) DEFAULT NULL,
-  `categoria_id` int(11) DEFAULT NULL
+  `stock` int(11) DEFAULT NULL,
+  `precio` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `consumibles`
 --
 
-INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `nombre_proveedor`, `modelo`, `serie_codigo`, `marca`, `unidad_medida`, `tamano`, `color`, `estado_fisico_actual`, `observacion`, `fecha_vencimiento`, `lote`, `categoria_id`) VALUES
-(1, 'Galletas oreo', 'S/D', 'S/D', 'S/D', '1', 'S/D', 'S/D', 'S/D', 'S/D', 'S/D', 'S/D', '2024-08-14', '1', NULL),
-(2, 'Maquina de cage 2', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '2024-08-15', '12', NULL);
+INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `nombre_proveedor`, `modelo`, `serie_codigo`, `marca`, `unidad_medida`, `tamano`, `color`, `estado_fisico_actual`, `observacion`, `fecha_vencimiento`, `lote`, `stock`, `precio`) VALUES
+(8, 'Galletas oreo', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2024-08-16', '1', 998, 100.00),
+(9, 'Maquina de crey', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '2024-08-21', '12', 12, 12.00);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `consumible_categoria`
+-- Estructura de tabla para la tabla `consumibles_categorias`
 --
 
-CREATE TABLE `consumible_categoria` (
+CREATE TABLE `consumibles_categorias` (
   `consumible_id` int(11) NOT NULL,
   `categoria_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `consumible_categoria`
+-- Volcado de datos para la tabla `consumibles_categorias`
 --
 
-INSERT INTO `consumible_categoria` (`consumible_id`, `categoria_id`) VALUES
-(1, 2);
+INSERT INTO `consumibles_categorias` (`consumible_id`, `categoria_id`) VALUES
+(8, 4),
+(9, 5);
 
 -- --------------------------------------------------------
 
@@ -177,11 +183,40 @@ INSERT INTO `users` (`id`, `username`, `password`, `nombres`, `apellidos`, `dni`
 
 CREATE TABLE `ventas` (
   `id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `cantidad` int(11) NOT NULL,
   `total` decimal(10,2) NOT NULL,
-  `fecha` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `ventas`
+--
+
+INSERT INTO `ventas` (`id`, `total`, `fecha`, `created_at`) VALUES
+(2, 100.00, '2024-08-09', '2024-08-09 19:06:01'),
+(3, 100.00, '2024-08-09', '2024-08-09 19:07:36');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ventas_detalles`
+--
+
+CREATE TABLE `ventas_detalles` (
+  `id` int(11) NOT NULL,
+  `venta_id` int(11) NOT NULL,
+  `consumible_id` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `ventas_detalles`
+--
+
+INSERT INTO `ventas_detalles` (`id`, `venta_id`, `consumible_id`, `cantidad`, `precio_unitario`) VALUES
+(3, 2, 8, 1, 100.00),
+(4, 3, 8, 1, 100.00);
 
 --
 -- Índices para tablas volcadas
@@ -197,8 +232,7 @@ ALTER TABLE `bienes`
 -- Indices de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nombre` (`nombre`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `clientes`
@@ -210,14 +244,13 @@ ALTER TABLE `clientes`
 -- Indices de la tabla `consumibles`
 --
 ALTER TABLE `consumibles`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_categoria` (`categoria_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `consumible_categoria`
+-- Indices de la tabla `consumibles_categorias`
 --
-ALTER TABLE `consumible_categoria`
-  ADD PRIMARY KEY (`consumible_id`,`categoria_id`),
+ALTER TABLE `consumibles_categorias`
+  ADD KEY `consumible_id` (`consumible_id`),
   ADD KEY `categoria_id` (`categoria_id`);
 
 --
@@ -239,6 +272,14 @@ ALTER TABLE `ventas`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `ventas_detalles`
+--
+ALTER TABLE `ventas_detalles`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `venta_id` (`venta_id`),
+  ADD KEY `consumible_id` (`consumible_id`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -252,7 +293,7 @@ ALTER TABLE `bienes`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
@@ -264,7 +305,7 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `consumibles`
 --
 ALTER TABLE `consumibles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `renta`
@@ -282,24 +323,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `ventas_detalles`
+--
+ALTER TABLE `ventas_detalles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
 --
 
 --
--- Filtros para la tabla `consumibles`
+-- Filtros para la tabla `consumibles_categorias`
 --
-ALTER TABLE `consumibles`
-  ADD CONSTRAINT `fk_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `consumibles_categorias`
+  ADD CONSTRAINT `consumibles_categorias_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `consumibles_categorias_ibfk_2` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE;
 
 --
--- Filtros para la tabla `consumible_categoria`
+-- Filtros para la tabla `ventas_detalles`
 --
-ALTER TABLE `consumible_categoria`
-  ADD CONSTRAINT `consumible_categoria_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `consumible_categoria_ibfk_2` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE;
+ALTER TABLE `ventas_detalles`
+  ADD CONSTRAINT `ventas_detalles_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`),
+  ADD CONSTRAINT `ventas_detalles_ibfk_2` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

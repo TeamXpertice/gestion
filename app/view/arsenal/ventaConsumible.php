@@ -72,6 +72,8 @@
                 <div id="ventaPreview">
                     <p>No hay productos seleccionados.</p>
                 </div>
+                <div id="totalVenta" class="mt-3">
+                </div>
                 <form id="ventaForm" action="/gestion/app/controller/ArsenalController.php?action=createVentaConsumible" method="post" class="mt-4">
                     <input type="hidden" id="productosSeleccionados" name="productosSeleccionados">
                     <button type="submit" class="btn btn-primary">Registrar Venta</button>
@@ -86,6 +88,33 @@
     <script>
         var productosSeleccionados = [];
 
+        $('#ventaForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/gestion/app/controller/ArsenalController.php?action=createVentaConsumible',
+                type: 'POST',
+                data: { productosSeleccionados: JSON.stringify(productosSeleccionados) }, // Enviar JSON como cadena
+                success: function(response) {
+                    var result = JSON.parse(response);
+                    
+                    if (result.success) {
+                        alert(result.success);
+                        // Limpiar campos y vista previa
+                        productosSeleccionados = [];
+                        actualizarPrevisualizacion();
+                        $('#ventaForm')[0].reset(); // Limpiar el formulario
+                    } else if (result.error) {
+                        alert(result.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    alert('Ocurrió un error. Inténtelo de nuevo.');
+                }
+            });
+        });
+
         function mostrarConsumiblesPorCategoria(categoriaId) {
             $.ajax({
                 url: '/gestion/app/controller/ArsenalController.php',
@@ -95,11 +124,13 @@
                     categoria_id: categoriaId
                 },
                 success: function(response) {
+                    console.log(response); 
                     try {
                         var consumibles = JSON.parse(response);
                         var html = '<table class="table table-bordered"><thead class="thead-dark"><tr><th>Nombre</th><th>Stock</th><th>Precio</th><th>Acción</th></tr></thead><tbody>';
                         consumibles.forEach(function(consumible) {
-                            html += '<tr><td>' + consumible.nombre + '</td><td>' + consumible.stock + '</td><td>' + consumible.precio.toFixed(2) + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.precio.toFixed(2) + ')">Agregar</button></td></tr>';
+                            var precio = parseFloat(consumible.precio);
+                            html += '<tr><td>' + consumible.nombre + '</td><td>' + consumible.stock + '</td><td>' + precio.toFixed(2) + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + precio.toFixed(2) + ', ' + consumible.stock + ')">Agregar</button></td></tr>';
                         });
                         html += '</tbody></table>';
                         $('#consumiblesList').html(html);
@@ -115,16 +146,31 @@
             });
         }
 
-        function agregarProducto(id, nombre, precio) {
-            productosSeleccionados.push({ id: id, nombre: nombre, precio: precio });
+        function agregarProducto(id, nombre, precio, stock) {
+            var productoExistente = productosSeleccionados.find(producto => producto.id === id);
+            if (productoExistente) {
+                if (productoExistente.cantidad < stock) {
+                    productoExistente.cantidad++;
+                } else {
+                    alert('No puedes agregar más de este producto. Stock máximo alcanzado.');
+                }
+            } else {
+                productosSeleccionados.push({ id: id, nombre: nombre, precio: precio, cantidad: 1, stock: stock });
+            }
             actualizarPrevisualizacion();
         }
 
         function actualizarPrevisualizacion() {
+            var total = 0;
             if (productosSeleccionados.length > 0) {
                 var html = '<ul class="list-group">';
-                productosSeleccionados.forEach(function(producto) {
-                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">' + producto.nombre + '<span class="badge badge-primary badge-pill">$' + producto.precio.toFixed(2) + '</span></li>';
+                productosSeleccionados.forEach(function(producto, index) {
+                    var subtotal = producto.precio * producto.cantidad;
+                    total += subtotal;
+                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">' + producto.nombre + ' - Cantidad: ' + producto.cantidad + 
+                            '<span><button type="button" class="btn btn-sm btn-primary" onclick="incrementarCantidad(' + index + ')">+</button> ' + 
+                            '<button type="button" class="btn btn-sm btn-danger" onclick="decrementarCantidad(' + index + ')">-</button></span>' +
+                            '<span class="badge badge-primary badge-pill">$' + subtotal.toFixed(2) + '</span></li>';
                 });
                 html += '</ul>';
             } else {
@@ -132,6 +178,27 @@
             }
             $('#ventaPreview').html(html);
             $('#productosSeleccionados').val(JSON.stringify(productosSeleccionados));
+
+            $('#totalVenta').html('<h4>Total: $' + total.toFixed(2) + '</h4>');
+        }
+
+        function incrementarCantidad(index) {
+            if (productosSeleccionados[index].cantidad < productosSeleccionados[index].stock) {
+                productosSeleccionados[index].cantidad++;
+                actualizarPrevisualizacion();
+            } else {
+                alert('No puedes agregar más de este producto. Stock máximo alcanzado.');
+            }
+        }
+
+        function decrementarCantidad(index) {
+            if (productosSeleccionados[index].cantidad > 1) {
+                productosSeleccionados[index].cantidad--;
+                actualizarPrevisualizacion();
+            } else {
+                productosSeleccionados.splice(index, 1);
+                actualizarPrevisualizacion();
+            }
         }
     </script>
 </body>

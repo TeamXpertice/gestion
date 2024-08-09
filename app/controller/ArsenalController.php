@@ -35,11 +35,7 @@ class ArsenalController extends BaseController {
         ]);
     }
 
-    public function showVentasRegistradas() {
-        $ventas = $this->model->getVentasRegistradas();
-        $this->loadView('arsenal.showVentasRegistradas', ['ventas' => $ventas]);
-    }
-
+  
     public function showVentaConsumible() {
         $consumibles = $this->model->getAllConsumibles();
         $categorias = $this->model->getAllCategorias();
@@ -50,55 +46,58 @@ class ArsenalController extends BaseController {
         ]);
     }
     public function getConsumiblesPorCategoria() {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-    
-        if (isset($_GET['categoria_id'])) {
-            $categoria_id = $_GET['categoria_id'];
-            $consumibles = $this->model->getConsumiblesPorCategoria($categoria_id);
-            
-            header('Content-Type: application/json');
-            echo json_encode($consumibles);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Categoria ID no proporcionado.']);
-        }
+        $categoriaId = $_GET['categoria_id'];
+        $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
+        error_log(print_r($consumibles, true)); 
+        echo json_encode($consumibles);
     }
     
     
     
-    
+    public function showVentasRegistradas() {
+        $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+        $ventas = $this->model->getVentasPorFecha($selectedDate);
+        $this->loadView('arsenal/showVentasRegistradas', ['ventas' => $ventas, 'selectedDate' => $selectedDate]);
+    }
     
     public function createVentaConsumible() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $idConsumible = $_GET['id'];
-        $cantidad = $_POST['cantidad'];
-
-        $consumible = $this->model->getConsumibleById($idConsumible);
-
-        if ($consumible && $consumible['stock'] >= $cantidad) {
-            $nuevoStock = $consumible['stock'] - $cantidad;
-            $this->model->updateConsumibleStock($idConsumible, $nuevoStock);
-
-            $precio = $consumible['precio'];
-            $total = $cantidad * $precio;
-
-            $sql = "INSERT INTO ventas (nombre, cantidad, total, fecha) VALUES (:nombre, :cantidad, :total, NOW())";
-            $stmt = $this->model->db->prepare($sql);
-            $stmt->execute([
-                ':nombre' => $consumible['nombre'],
-                ':cantidad' => $cantidad,
-                ':total' => $total
-            ]);
-
-            header("Location: /gestion/app/controller/ArsenalController.php?action=showVentaConsumible&id=$idConsumible");
-            exit;
+        if (isset($_POST['productosSeleccionados'])) {
+            $productosSeleccionados = json_decode($_POST['productosSeleccionados'], true);
+    
+            if (!empty($productosSeleccionados)) {
+                $total = 0;
+                foreach ($productosSeleccionados as $producto) {
+                    $total += $producto['precio'] * $producto['cantidad'];
+                }
+    
+                $ventaId = $this->model->insertVenta($total);
+    
+                if ($ventaId) {
+                    foreach ($productosSeleccionados as $producto) {
+                        $stockActual = $this->model->getStockConsumible($producto['id']);
+                        if ($stockActual >= $producto['cantidad']) {
+                            $this->model->insertVentaDetalle($ventaId, $producto['id'], $producto['cantidad'], $producto['precio']);
+                            $this->model->updateStockConsumible($producto['id'], $stockActual - $producto['cantidad']);
+                        } else {
+                            echo json_encode(['error' => 'No hay suficiente stock para realizar la venta.']);
+                            return;
+                        }
+                    }
+    
+                    
+                    echo json_encode(['success' => 'Venta registrada con éxito.']);
+                    return;
+                } else {
+                    echo json_encode(['error' => 'Error al registrar la venta.']);
+                    return;
+                }
+            }
         } else {
-            echo "No hay suficiente stock para realizar la venta.";
+            echo json_encode(['error' => 'No se seleccionaron productos.']);
+            return;
         }
     }
-}
+    
 
     public function createBien() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -168,9 +167,9 @@ class ArsenalController extends BaseController {
             }
         }
     }
+    
     public function createConsumible() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Recoge los datos del formulario
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
             $nombre_proveedor = $_POST['nombre_proveedor'];
@@ -180,16 +179,18 @@ class ArsenalController extends BaseController {
             $unidad_medida = $_POST['unidad_medida'];
             $tamano = $_POST['tamano'];
             $color = $_POST['color'];
-            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : []; 
             $estado_fisico_actual = $_POST['estado_fisico_actual'];
             $observacion = $_POST['observacion'];
             $fecha_vencimiento = $_POST['fecha_vencimiento'];
             $lote = $_POST['lote'];
+            $precio = $_POST['precio']; 
+            $stock = $_POST['stock']; 
+            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : []; 
     
             $consumibleId = $this->model->createConsumible(
-                $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote
+                $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote, $precio, $stock  // Nuevo campo
             );
-    
+
             if ($consumibleId) {
                 $this->model->assignCategoriasToConsumible($consumibleId, $categorias); 
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
@@ -198,11 +199,13 @@ class ArsenalController extends BaseController {
                 echo "Failed to create consumible.";
             }
         } else {
-            // Carga las categorías para mostrarlas en el formulario
             $categorias = $this->model->getAllCategorias(); 
             $this->loadView('arsenal.createConsumible', ['categorias' => $categorias]);
         }
     }
+    
+    
+    
     
     public function editConsumible() {
         $id = $_GET['id'];

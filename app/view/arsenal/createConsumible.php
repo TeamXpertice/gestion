@@ -39,7 +39,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label for="serie_codigo">Serie/código:</label>
-                    <input type="number" id="serie_codigo" name="serie_codigo" class="form-control">
+                    <input type="text" id="serie_codigo" name="serie_codigo" class="form-control">
                 </div>
                 <div class="form-group col-md-4">
                     <label for="marca">Marca:</label>
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="form-row">
-            <?php if (isset($categorias) && is_array($categorias)): ?>
+                <?php if (isset($categorias) && is_array($categorias)): ?>
                     <div class="form-group col-md-12" id="categorias">
                         <label for="categorias">Categorías:</label><br>
                         <?php foreach ($categorias as $categoria): ?>
@@ -79,7 +79,6 @@
                     <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
                     <button type="button" id="agregar_categoria" class="btn btn-secondary mt-2">Agregar</button>
                 </div>
-
 
                 <div class="form-group col-md-4">
                     <label for="estado_fisico_actual">Estado físico del consumible*:</label>
@@ -105,11 +104,20 @@
                     <label for="lote">Lote:</label>
                     <input type="text" id="lote" name="lote" class="form-control">
                 </div>
+                <div class="form-group col-md-4">
+                    <label for="stock">Stock*:</label>
+                    <input type="number" id="stock" name="stock" class="form-control" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="precio">Precio*:</label>
+                    <input type="number" id="precio" name="precio" class="form-control" step="0.01" required>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Agregar Consumible</button>
         </form>
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
 $(document).ready(function() {
     $('#agregar_categoria').click(function() {
@@ -131,7 +139,6 @@ $(document).ready(function() {
         }
     });
 });
-
     </script>
 </body>
 </html>
