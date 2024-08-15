@@ -6,8 +6,7 @@
     <title>Arsenal</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
-        <!-- data table -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
 
 </head>
@@ -48,7 +47,7 @@
                 </table>
             </div>
             <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+            <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
@@ -57,12 +56,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
+
     <script>
         $(document).ready(function() {
-            $('#consumiblesTable').DataTable({
-                dom: 'Bfrtip',
+            $('.table').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json" 
+                },
+                dom: 'Bfrtip', 
                 buttons: [
-                    'csv', 'excel', 'pdf'
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        title: 'Bienes_Registrados' 
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        title: 'Bienes_Registrados',
+                        exportOptions: {
+                        columns: ':not(:last-child)' 
+                    }
+                        
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        title: 'Bienes Registrados',
+                        exportOptions: {
+                        columns: ':not(:last-child)' 
+                    }
+                    }
                 ]
             });
         });

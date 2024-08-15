@@ -18,8 +18,23 @@ class Arsenal extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getVentasRegistradas() {
-        $stmt = $this->db->query("SELECT * FROM ventas");
+    public function getVentasPorFecha($selectedDate) {
+        $sql = "
+            SELECT 
+                c.nombre as nombre,
+                vd.cantidad as cantidad,
+                v.total as total,
+                v.fecha as fecha
+            FROM ventas v
+            JOIN ventas_detalles vd ON v.id = vd.venta_id
+            JOIN consumibles c ON vd.consumible_id = c.id
+            WHERE v.fecha = :selectedDate
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':selectedDate', $selectedDate);
+        $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -55,12 +70,7 @@ class Arsenal extends BaseModel {
             return []; 
         }
     }
-    public function getVentasPorFecha($fecha) {
-        $stmt = $this->db->prepare("SELECT * FROM ventas WHERE fecha = :fecha");
-        $stmt->bindParam(':fecha', $fecha);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+
     
     
     

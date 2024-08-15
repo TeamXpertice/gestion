@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-08-2024 a las 22:56:27
+-- Tiempo de generación: 15-08-2024 a las 16:28:52
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -114,8 +114,8 @@ CREATE TABLE `consumibles` (
 --
 
 INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `nombre_proveedor`, `modelo`, `serie_codigo`, `marca`, `unidad_medida`, `tamano`, `color`, `estado_fisico_actual`, `observacion`, `fecha_vencimiento`, `lote`, `stock`, `precio`) VALUES
-(8, 'Galletas oreo', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2024-08-16', '1', 998, 100.00),
-(9, 'Maquina de crey', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '2024-08-21', '12', 12, 12.00);
+(8, 'Galletas oreo', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2024-08-16', '1', 995, 100.00),
+(9, 'Maquina de crey', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '2024-08-21', '12', 10, 12.00);
 
 -- --------------------------------------------------------
 
@@ -194,7 +194,12 @@ CREATE TABLE `ventas` (
 
 INSERT INTO `ventas` (`id`, `total`, `fecha`, `created_at`) VALUES
 (2, 100.00, '2024-08-09', '2024-08-09 19:06:01'),
-(3, 100.00, '2024-08-09', '2024-08-09 19:07:36');
+(3, 100.00, '2024-08-09', '2024-08-09 19:07:36'),
+(4, 100.00, '2024-08-09', '2024-08-09 20:57:49'),
+(5, 100.00, '2024-08-09', '2024-08-09 20:59:15'),
+(6, 100.00, '2024-08-09', '2024-08-10 02:26:27'),
+(7, 12.00, '2024-08-10', '2024-08-11 02:28:12'),
+(8, 12.00, '2024-08-14', '2024-08-15 01:26:02');
 
 -- --------------------------------------------------------
 
@@ -216,7 +221,12 @@ CREATE TABLE `ventas_detalles` (
 
 INSERT INTO `ventas_detalles` (`id`, `venta_id`, `consumible_id`, `cantidad`, `precio_unitario`) VALUES
 (3, 2, 8, 1, 100.00),
-(4, 3, 8, 1, 100.00);
+(4, 3, 8, 1, 100.00),
+(5, 4, 8, 1, 100.00),
+(6, 5, 8, 1, 100.00),
+(7, 6, 8, 1, 100.00),
+(8, 7, 9, 1, 12.00),
+(9, 8, 9, 1, 12.00);
 
 --
 -- Índices para tablas volcadas
@@ -323,13 +333,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas_detalles`
 --
 ALTER TABLE `ventas_detalles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Restricciones para tablas volcadas
