@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-08-2024 a las 16:28:52
+-- Tiempo de generación: 16-08-2024 a las 19:36:32
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -87,6 +87,24 @@ CREATE TABLE `clientes` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `compras`
+--
+
+CREATE TABLE `compras` (
+  `id` int(11) NOT NULL,
+  `descripcion_compra` varchar(255) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `costo_unitario` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `fecha` date NOT NULL,
+  `proveedor` varchar(255) DEFAULT NULL,
+  `metodo_pago` varchar(255) DEFAULT NULL,
+  `observacion` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `consumibles`
 --
 
@@ -114,7 +132,7 @@ CREATE TABLE `consumibles` (
 --
 
 INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `nombre_proveedor`, `modelo`, `serie_codigo`, `marca`, `unidad_medida`, `tamano`, `color`, `estado_fisico_actual`, `observacion`, `fecha_vencimiento`, `lote`, `stock`, `precio`) VALUES
-(8, 'Galletas oreo', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2024-08-16', '1', 995, 100.00),
+(8, 'Galletas oreo', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2024-08-16', '1', 994, 100.00),
 (9, 'Maquina de crey', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '2024-08-21', '12', 10, 12.00);
 
 -- --------------------------------------------------------
@@ -199,7 +217,8 @@ INSERT INTO `ventas` (`id`, `total`, `fecha`, `created_at`) VALUES
 (5, 100.00, '2024-08-09', '2024-08-09 20:59:15'),
 (6, 100.00, '2024-08-09', '2024-08-10 02:26:27'),
 (7, 12.00, '2024-08-10', '2024-08-11 02:28:12'),
-(8, 12.00, '2024-08-14', '2024-08-15 01:26:02');
+(8, 12.00, '2024-08-14', '2024-08-15 01:26:02'),
+(9, 100.00, '2024-08-15', '2024-08-16 03:35:47');
 
 -- --------------------------------------------------------
 
@@ -226,7 +245,8 @@ INSERT INTO `ventas_detalles` (`id`, `venta_id`, `consumible_id`, `cantidad`, `p
 (6, 5, 8, 1, 100.00),
 (7, 6, 8, 1, 100.00),
 (8, 7, 9, 1, 12.00),
-(9, 8, 9, 1, 12.00);
+(9, 8, 9, 1, 12.00),
+(10, 9, 8, 1, 100.00);
 
 --
 -- Índices para tablas volcadas
@@ -248,6 +268,12 @@ ALTER TABLE `categorias`
 -- Indices de la tabla `clientes`
 --
 ALTER TABLE `clientes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `compras`
+--
+ALTER TABLE `compras`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -312,6 +338,12 @@ ALTER TABLE `clientes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `compras`
+--
+ALTER TABLE `compras`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `consumibles`
 --
 ALTER TABLE `consumibles`
@@ -333,13 +365,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas_detalles`
 --
 ALTER TABLE `ventas_detalles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Restricciones para tablas volcadas

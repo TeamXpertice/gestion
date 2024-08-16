@@ -63,6 +63,13 @@
                         <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showConsumible">Consumibles</a>
                     </div>
                 </div>
+                <div class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="comprasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Compras</a>
+    <div class="dropdown-menu" aria-labelledby="comprasDropdown">
+        <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showCompras">Realizar Compra</a>
+        <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showRegistroCompras">Registro de Compras</a>
+    </div>
+</div>
             </nav>
             <div class="user-info mt-auto text-center">
                 <a href="/gestion/app/controller/logoutController.php" class="btn btn-danger">Cerrar Sesión</a>
