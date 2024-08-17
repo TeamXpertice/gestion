@@ -30,7 +30,7 @@ if (!empty($compras)) {
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Registro de Compras</h1>
+    <h1 class="mb-4">Registro de Comprass</h1>
     <div class="mb-4">
         <form action="/gestion/app/controller/ComprasController.php" method="get">
             <input type="hidden" name="action" value="showRegistroCompras">
