@@ -26,57 +26,63 @@
         <form action="/gestion/app/controller/ArsenalController.php?action=createBien" method="post">
             <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="nombre">Nombre*:</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                    <label for="descripcion_bien">Descripción*:</label>
+                    <input type="text" id="descripcion_bien" name="descripcion_bien" class="form-control" required>
                 </div>
-
                 <div class="form-group col-md-4">
-                    <label for="nombre_proveedor">Nombre del proveedor*:</label>
-                    <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="form-control" required>
+                    <label for="nombre_proveedor">Nombre del proveedor:</label>
+                    <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="form-control">
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="modelo">Modelo:</label>
                     <input type="text" id="modelo" name="modelo" class="form-control">
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="serie_codigo">Serie/código:</label>
-                    <input type="number" id="serie_codigo" name="serie_codigo" class="form-control">
+                    <label for="serie_codigo">Serie/Código:</label>
+                    <input type="text" id="serie_codigo" name="serie_codigo" class="form-control">
                 </div>
                 <div class="form-group col-md-4">
                     <label for="marca">Marca:</label>
                     <input type="text" id="marca" name="marca" class="form-control">
                 </div>
+                <div class="form-group col-md-4">
+                    <label for="estado">Estado*:</label>
+                    <input type="text" id="estado" name="estado" class="form-control" required>
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="unidad_medida">Unidad de medida*:</label>
-                    <input type="text" id="unidad_medida" name="unidad_medida" class="form-control" required>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="tamano">tamano*:</label>
-                    <input type="text" id="tamano" name="tamano" class="form-control" required>
+                    <label for="dimensiones">Dimensiones*:</label>
+                    <input type="text" id="dimensiones" name="dimensiones" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
                     <label for="color">Color*:</label>
                     <input type="text" id="color" name="color" class="form-control" required>
                 </div>
+                <div class="form-group col-md-4">
+                    <label for="tipo_material">Tipo de Material*:</label>
+                    <input type="text" id="tipo_material" name="tipo_material" class="form-control" required>
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="tipo_material">Tipo de material*:</label>
-                    <input type="text" id="tipo_material" name="tipo_material" class="form-control" required>
-                </div>
-
-                <div class="form-group col-md-4">
-                    <label for="estado_fisico_actual">Estado físico del bien*:</label>
+                    <label for="estado_fisico_actual">Estado Físico Actual*:</label>
                     <input type="text" id="estado_fisico_actual" name="estado_fisico_actual" class="form-control" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="cantidad">Cantidad:</label>
+                    <input type="number" id="cantidad" name="cantidad" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="coste">Coste por Unidad*:</label>
+                    <input type="number" id="coste" name="coste" class="form-control" step="0.01" required>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="descripcion_bien">Descripción*:</label>
+                    <label for="descripcion_bien">Descripción:</label>
                     <textarea id="descripcion_bien" name="descripcion_bien" class="form-control descripcion_bien" required></textarea>
                 </div>
                 <div class="form-group col-md-6">

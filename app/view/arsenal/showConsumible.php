@@ -14,16 +14,14 @@
             <div class="container mt-1">
                 <h2>Consumibles</h2>
                 <a href="/gestion/app/controller/ArsenalController.php?action=createConsumible" class="btn btn-primary mb-3">Agregar Consumible</a>
+                
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                           
-                            <th>Marca</th>
-                           
                             <th>Descripción</th>
                             <th>Fecha de Vencimiento</th>
-                           
+                            <th>Precio</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -31,12 +29,9 @@
                         <?php foreach ($consumibles as $consumible): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($consumible['nombre']); ?></td>
-                           
-                            <td><?php echo htmlspecialchars($consumible['marca']); ?></td>
-                           
                             <td><?php echo htmlspecialchars($consumible['descripcion_consumible']); ?></td>
                             <td><?php echo htmlspecialchars($consumible['fecha_vencimiento']); ?></td>
-                           
+                            <td><?php echo htmlspecialchars($consumible['precio']); ?></td>
                             <td>
                                 <a href="/gestion/app/controller/ArsenalController.php?action=editConsumible&id=<?php echo $consumible['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
                                 <a href="/gestion/app/controller/ArsenalController.php?action=deleteConsumible&id=<?php echo $consumible['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este consumible?');">Eliminar</a>

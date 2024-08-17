@@ -8,7 +8,8 @@
 <body>
 <div class="container mt-5">
     <h1>Dashboard</h1>
-    <p>Bienvenido, <?php echo htmlspecialchars($username); ?>!</p>
+    <p>Usuario: <strong><?php echo htmlspecialchars($_SESSION['nombres'] ?? 'Invitado'); ?></strong></p>
+
 </div>
 </body>
 </html>

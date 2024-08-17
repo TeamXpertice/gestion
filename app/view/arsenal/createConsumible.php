@@ -3,142 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Consumible</title>
+    <title>Crear Consumible</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
-    <style>
-        .form-row .col-md-4 {
-            margin-bottom: 1.5rem;
-        }
-        textarea.form-control {
-            height: 100px;
-        }
-        textarea.form-control.observacion, textarea.form-control.descripcion_consumible {
-            height: 200px;
-        }
-    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Agregar Consumible</h1>
+        <h1>Crear Consumible</h1>
         <form action="/gestion/app/controller/ArsenalController.php?action=createConsumible" method="post">
             <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="nombre">Nombre*:</label>
+                    <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" class="form-control" required>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="nombre_proveedor">Nombre del proveedor*:</label>
-                    <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="form-control" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="modelo">Modelo:</label>
-                    <input type="text" id="modelo" name="modelo" class="form-control">
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="serie_codigo">Serie/código:</label>
-                    <input type="text" id="serie_codigo" name="serie_codigo" class="form-control">
                 </div>
                 <div class="form-group col-md-4">
                     <label for="marca">Marca:</label>
                     <input type="text" id="marca" name="marca" class="form-control">
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="unidad_medida">Unidad de medida*:</label>
+                    <label for="unidad_medida">Unidad de Medida:</label>
                     <input type="text" id="unidad_medida" name="unidad_medida" class="form-control" required>
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group col-md-4">
-                    <label for="tamano">Tamaño*:</label>
-                    <input type="text" id="tamano" name="tamano" class="form-control" required>
+                    <label for="stock">Stock:</label>
+                    <input type="number" id="stock" name="stock" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="color">Color*:</label>
-                    <input type="text" id="color" name="color" class="form-control" required>
+                    <label for="coste">Coste:</label>
+                    <input type="number" id="coste" name="coste" class="form-control" step="0.01">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="precio">Precio:</label>
+                    <input type="number" id="precio" name="precio" class="form-control" step="0.01" required>
                 </div>
             </div>
             <div class="form-row">
-                <?php if (isset($categorias) && is_array($categorias)): ?>
-                    <div class="form-group col-md-12" id="categorias">
-                        <label for="categorias">Categorías:</label><br>
+                <div class="form-group col-md-6">
+                    <label for="descripcion_consumible">Descripción:</label>
+                    <textarea id="descripcion_consumible" name="descripcion_consumible" class="form-control" required></textarea>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="observacion">Observación:</label>
+                    <textarea id="observacion" name="observacion" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="fecha_compra">Fecha de Compra:</label>
+                    <input type="date" id="fecha_compra" name="fecha_compra" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" class="form-control" required>
+                    <option value="" disabled selected>Selecciona una categoría</option>
                         <?php foreach ($categorias as $categoria): ?>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="categorias[]" value="<?php echo htmlspecialchars($categoria['id']); ?>">
-                                <label class="form-check-label"><?php echo htmlspecialchars($categoria['nombre']); ?></label>
-                            </div>
+                            <option value="<?php echo htmlspecialchars($categoria['id']); ?>">
+                                <?php echo htmlspecialchars($categoria['nombre']); ?>
+                            </option>
                         <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <p>No se encontraron categorías.</p>
-                <?php endif; ?>
-                <div class="form-group col-md-12 mt-3">
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
                     <label for="nueva_categoria">Agregar nueva categoría:</label>
                     <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
                     <button type="button" id="agregar_categoria" class="btn btn-secondary mt-2">Agregar</button>
                 </div>
-
-                <div class="form-group col-md-4">
-                    <label for="estado_fisico_actual">Estado físico del consumible*:</label>
-                    <input type="text" id="estado_fisico_actual" name="estado_fisico_actual" class="form-control" required>
-                </div>
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="descripcion_consumible">Descripción*:</label>
-                    <textarea id="descripcion_consumible" name="descripcion_consumible" class="form-control descripcion_consumible" required></textarea>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="observacion">Observación:</label>
-                    <textarea id="observacion" name="observacion" class="form-control observacion"></textarea>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="fecha_vencimiento">Fecha de vencimiento:</label>
-                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control">
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="lote">Lote:</label>
-                    <input type="text" id="lote" name="lote" class="form-control">
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="stock">Stock*:</label>
-                    <input type="number" id="stock" name="stock" class="form-control" required>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="precio">Precio*:</label>
-                    <input type="number" id="precio" name="precio" class="form-control" step="0.01" required>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Agregar Consumible</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-$(document).ready(function() {
-    $('#agregar_categoria').click(function() {
-        var nuevaCategoria = $('#nueva_categoria').val();
-        if (nuevaCategoria.trim() !== '') {
-            $.post('/gestion/app/controller/ArsenalController.php?action=addCategoria', { nombre: nuevaCategoria }, function(response) {
-                if (response.success) {
-                    var newId = response.id;
-                    var newCategoria = `<div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="categorias[]" value="${newId}" checked>
-                        <label class="form-check-label">${nuevaCategoria}</label>
-                    </div>`;
-                    $('#categorias').append(newCategoria);
-                    $('#nueva_categoria').val('');
-                } else {
-                    alert('Error al agregar la categoría.');
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            $('#agregar_categoria').click(function() {
+                var nuevaCategoria = $('#nueva_categoria').val();
+                if (nuevaCategoria.trim() === '') {
+                    alert('Por favor ingrese una categoría.');
+                    return;
                 }
-            }, 'json');
-        }
-    });
-});
-    </script>
+
+                $.post('/gestion/app/controller/ArsenalController.php?action=addCategoria', { nombre: nuevaCategoria }, function(response) {
+                    if (response.success) {
+                        $('#nueva_categoria').val('');
+                        $('#categoria').append('<option value="' + response.id + '">' + response.nombre + '</option>');
+                        alert('Categoría agregada con éxito.');
+                    } else {
+                        alert('Error al agregar categoría.');
+                    }
+                }, 'json');
+            });
+        });
+</script>
+
 </body>
 </html>

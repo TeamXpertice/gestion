@@ -12,68 +12,64 @@
         <h1>Editar Consumible</h1>
         <form action="/gestion/app/controller/ArsenalController.php?action=editConsumible&id=<?php echo htmlspecialchars($consumible['id']); ?>" method="post">
             <div class="form-row">
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" class="form-control" value="<?php echo htmlspecialchars($consumible['nombre']); ?>" required>
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="nombre_proveedor">Nombre del Proveedor:</label>
-                    <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="form-control" value="<?php echo htmlspecialchars($consumible['nombre_proveedor']); ?>" required>
-                </div>
-                <div class="form-group col-md-3">
-                    <label for="modelo">Modelo:</label>
-                    <input type="text" id="modelo" name="modelo" class="form-control" value="<?php echo htmlspecialchars($consumible['modelo']); ?>" required>
-                </div>
-                <div class="form-group col-md-3">
-                    <label for="serie_codigo">Serie/Código:</label>
-                    <input type="text" id="serie_codigo" name="serie_codigo" class="form-control" value="<?php echo htmlspecialchars($consumible['serie_codigo']); ?>" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                     <label for="marca">Marca:</label>
-                    <input type="text" id="marca" name="marca" class="form-control" value="<?php echo htmlspecialchars($consumible['marca']); ?>" required>
+                    <input type="text" id="marca" name="marca" class="form-control" value="<?php echo htmlspecialchars($consumible['marca']); ?>">
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                     <label for="unidad_medida">Unidad de Medida:</label>
                     <input type="text" id="unidad_medida" name="unidad_medida" class="form-control" value="<?php echo htmlspecialchars($consumible['unidad_medida']); ?>" required>
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="tamano">Tamaño:</label>
-                    <input type="text" id="tamano" name="tamano" class="form-control" value="<?php echo htmlspecialchars($consumible['tamano']); ?>" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="stock">Stock:</label>
+                    <input type="number" id="stock" name="stock" class="form-control" value="<?php echo htmlspecialchars($consumible['stock']); ?>" required>
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="color">Color:</label>
-                    <input type="text" id="color" name="color" class="form-control" value="<?php echo htmlspecialchars($consumible['color']); ?>" required>
+                <div class="form-group col-md-4">
+                    <label for="coste">Coste:</label>
+                    <input type="number" id="coste" name="coste" class="form-control" step="0.01" value="<?php echo htmlspecialchars($consumible['coste']); ?>">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="precio">Precio:</label>
+                    <input type="number" id="precio" name="precio" class="form-control" step="0.01" value="<?php echo htmlspecialchars($consumible['precio']); ?>" required>
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-md-3">
-                    <label for="tipo_material">Tipo de Material:</label>
-                    <input type="text" id="tipo_material" name="tipo_material" class="form-control" value="<?php echo htmlspecialchars($consumible['tipo_material']); ?>" required>
+                <div class="form-group col-md-6">
+                    <label for="descripcion_consumible">Descripción:</label>
+                    <textarea id="descripcion_consumible" name="descripcion_consumible" class="form-control" required><?php echo htmlspecialchars($consumible['descripcion_consumible']); ?></textarea>
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="estado_fisico_actual">Estado Físico Actual:</label>
-                    <input type="text" id="estado_fisico_actual" name="estado_fisico_actual" class="form-control" value="<?php echo htmlspecialchars($consumible['estado_fisico_actual']); ?>" required>
+                <div class="form-group col-md-6">
+                    <label for="observacion">Observación:</label>
+                    <textarea id="observacion" name="observacion" class="form-control"><?php echo htmlspecialchars($consumible['observacion']); ?></textarea>
                 </div>
-                <div class="form-group col-md-3">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
                     <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
-                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control" value="<?php echo htmlspecialchars($consumible['fecha_vencimiento']); ?>" required>
+                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control" value="<?php echo htmlspecialchars($consumible['fecha_vencimiento']); ?>">
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="lote">Lote:</label>
-                    <input type="text" id="lote" name="lote" class="form-control" value="<?php echo htmlspecialchars($consumible['lote']); ?>" required>
+                <div class="form-group col-md-4">
+                    <label for="fecha_compra">Fecha de Compra:</label>
+                    <input type="date" id="fecha_compra" name="fecha_compra" class="form-control" value="<?php echo htmlspecialchars($consumible['fecha_compra']); ?>">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" class="form-control">
+                        <?php foreach ($categorias as $categoria): ?>
+                            <option value="<?php echo htmlspecialchars($categoria['id']); ?>" <?php echo ($consumible['categoria_id'] == $categoria['id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($categoria['nombre']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="descripcion_consumible">Descripción:</label>
-                <textarea id="descripcion_consumible" name="descripcion_consumible" class="form-control" required><?php echo htmlspecialchars($consumible['descripcion_consumible']); ?></textarea>
-            </div>
-            <div class="form-group">
-                <label for="observacion">Observación:</label>
-                <textarea id="observacion" name="observacion" class="form-control" required><?php echo htmlspecialchars($consumible['observacion']); ?></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         </form>
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>

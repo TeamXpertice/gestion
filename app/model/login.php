@@ -3,19 +3,18 @@
 include 'BaseModel.php';
 
 class Login extends BaseModel {
-    public function authenticate($username, $password) {
-        $query = "SELECT * FROM users WHERE username = :username AND password = :password";
+    public function authenticate($correo, $contrasena) {
+        $query = "SELECT * FROM administradores WHERE correo = :correo AND contrasena = :contrasena";
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':correo', $correo);
+        $stmt->bindParam(':contrasena', $contrasena);
         $stmt->execute();
-
+    
         if ($stmt->rowCount() > 0) {
-            return true;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } else {
             return false;
         }
     }
 }
-
 ?>

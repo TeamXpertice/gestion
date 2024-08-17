@@ -16,28 +16,19 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Proveedor</th>
-                    <th>Modelo</th>
-                    <th>Serie/Código</th>
-                    <th>Marca</th>
-                    <th>Color</th>
-                    <th>Estado Físico</th>
-                    <th>Observación</th>
+                    <th>Descripcion</th>
+                    <th>Estado</th>
+                    <th>Cantidad</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($bienes as $bien): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($bien['nombre']); ?></td>
-                    <td><?php echo htmlspecialchars($bien['nombre_proveedor']); ?></td>
-                    <td><?php echo htmlspecialchars($bien['modelo']); ?></td>
-                    <td><?php echo htmlspecialchars($bien['serie_codigo']); ?></td>
-                    <td><?php echo htmlspecialchars($bien['marca']); ?></td>
-                    <td><?php echo htmlspecialchars($bien['color']); ?></td>
+                    <td><?php echo htmlspecialchars($bien['descripcion_bien']); ?></td>
                     <td><?php echo htmlspecialchars($bien['estado_fisico_actual']); ?></td>
-                    <td><?php echo htmlspecialchars($bien['observacion']); ?></td>
+                    <td><?php echo htmlspecialchars($bien['cantidad']); ?></td>
+
                     <td>
                         <a href="/gestion/app/controller/ArsenalController.php?action=editBien&id=<?php echo $bien['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
                         <a href="/gestion/app/controller/ArsenalController.php?action=deleteBien&id=<?php echo $bien['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este bien?');">Eliminar</a>

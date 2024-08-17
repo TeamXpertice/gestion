@@ -8,41 +8,65 @@ class ArsenalController extends BaseController {
     public function __construct() {
         $this->model = new Arsenal();
     }
-
+////////////////////////////////////////////////SHOWS///////////////////////////////////////////////////
     public function showArsenal() {
+        $nombre = $this->checkLogin();
         $bienes = $this->model->getBienes();
         $consumibles = $this->model->getConsumibles();
-        $this->loadView('arsenal.showArsenal', ['bienes' => $bienes, 'consumibles' => $consumibles]);
-    }
-
-    public function showBien() {
-        $bienes = $this->model->getBienes();
-        $this->loadView('arsenal.showBien', ['bienes' => $bienes]);
-    }
-
-    public function showConsumible() {
-        $consumibles = $this->model->getConsumibles();
-        $this->loadView('arsenal.showConsumible', ['consumibles' => $consumibles]);
-    }
-
-    public function showCreateConsumible() {
-        $categorias = $this->model->getAllCategorias();
-        
-        $this->loadView('arsenal.createConsumible', [
-            'categorias' => $categorias
+        $this->loadView('arsenal.showArsenal', [
+            'bienes' => $bienes, 
+            'consumibles' => $consumibles, 
+            'nombre' => $nombre
         ]);
     }
 
-  
+    public function showBien() {
+        $nombre = $this->checkLogin();
+        $bienes = $this->model->getBienes();
+        $this->loadView('arsenal.showBien', [
+        'bienes' => $bienes, 
+        'nombre' => $nombre]);
+    }
+
+    public function showConsumible() {
+        $nombre = $this->checkLogin();
+        $consumibles = $this->model->getConsumibles();
+        $this->loadView('arsenal.showConsumible', [
+        'consumibles' => $consumibles, 
+        'nombre' => $nombre]);
+    }
+
+    public function showCreateConsumible() {
+        $nombre = $this->checkLogin();
+        $categorias = $this->model->getAllCategorias();
+        
+        $this->loadView('arsenal.createConsumible', [
+            'categorias' => $categorias, 
+            'nombre' => $nombre
+        ]);
+    }
     public function showVentaConsumible() {
+        $nombre = $this->checkLogin();
         $consumibles = $this->model->getAllConsumibles();
         $categorias = $this->model->getAllCategorias();
 
         $this->loadView('arsenal.ventaConsumible', [
             'consumibles' => $consumibles,
-            'categorias' => $categorias
+            'categorias' => $categorias, 
+            'nombre' => $nombre
         ]);
     }
+    public function showVentasRegistradas() {
+        $nombre = $this->checkLogin();
+        $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+        $ventas = $this->model->getVentasPorFecha($selectedDate);
+        $this->loadView('arsenal/showVentasRegistradas', [
+        'ventas' => $ventas, 
+        'selectedDate' => $selectedDate, 
+        'nombre' => $nombre]);
+    }
+////////////////////////////////////////////////GET///////////////////////////////////////////////////
+
     public function getConsumiblesPorCategoria() {
         $categoriaId = $_GET['categoria_id'];
         $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
@@ -50,13 +74,7 @@ class ArsenalController extends BaseController {
         echo json_encode($consumibles);
     }
     
-    
-    
-    public function showVentasRegistradas() {
-        $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
-        $ventas = $this->model->getVentasPorFecha($selectedDate);
-        $this->loadView('arsenal/showVentasRegistradas', ['ventas' => $ventas, 'selectedDate' => $selectedDate]);
-    }
+////////////////////////////////////////////////CREATE///////////////////////////////////////////////////
     
     public function createVentaConsumible() {
         if (isset($_POST['productosSeleccionados'])) {
@@ -96,24 +114,25 @@ class ArsenalController extends BaseController {
         }
     }
     
-
     public function createBien() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nombre = $_POST['nombre'];
+
             $descripcion_bien = $_POST['descripcion_bien'];
             $nombre_proveedor = $_POST['nombre_proveedor'];
             $modelo = $_POST['modelo'];
             $serie_codigo = $_POST['serie_codigo'];
             $marca = $_POST['marca'];
-            $unidad_medida = $_POST['unidad_medida'];
-            $tamano = $_POST['tamano'];
+            $estado = $_POST['estado'];
+            $dimensiones = $_POST['dimensiones'];
             $color = $_POST['color'];
             $tipo_material = $_POST['tipo_material'];
             $estado_fisico_actual = $_POST['estado_fisico_actual'];
+            $cantidad = $_POST['cantidad'];
+            $coste = $_POST['coste'];
             $observacion = $_POST['observacion'];
     
             $result = $this->model->createBien(
-                $nombre, $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion
+                 $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $estado, $dimensiones, $color, $tipo_material, $estado_fisico_actual, $cantidad, $coste, $observacion
             );
     
             if ($result) {
@@ -126,25 +145,25 @@ class ArsenalController extends BaseController {
             $this->loadView('arsenal.createBien');
         }
     }
-
     public function editBien() {
         $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nombre = $_POST['nombre'];
             $descripcion_bien = $_POST['descripcion_bien'];
             $nombre_proveedor = $_POST['nombre_proveedor'];
             $modelo = $_POST['modelo'];
             $serie_codigo = $_POST['serie_codigo'];
             $marca = $_POST['marca'];
-            $unidad_medida = $_POST['unidad_medida'];
-            $tamano = $_POST['tamano'];
+            $estado = $_POST['estado'];
+            $dimensiones = $_POST['dimensiones'];
             $color = $_POST['color'];
             $tipo_material = $_POST['tipo_material'];
             $estado_fisico_actual = $_POST['estado_fisico_actual'];
+            $cantidad = $_POST['cantidad'];
+            $coste = $_POST['coste'];
             $observacion = $_POST['observacion'];
     
             $this->model->updateBien(
-                $id, $nombre, $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $tipo_material, $estado_fisico_actual, $observacion
+                $id, $descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $estado, $dimensiones, $color, $tipo_material, $estado_fisico_actual, $cantidad, $coste, $observacion
             );
     
             header('Location: /gestion/app/controller/ArsenalController.php?action=showBien');
@@ -153,6 +172,7 @@ class ArsenalController extends BaseController {
             $this->loadView('arsenal.editBien', ['bien' => $bien]);
         }
     }
+    
     public function addCategoria() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
@@ -164,77 +184,66 @@ class ArsenalController extends BaseController {
                 echo json_encode(['success' => false]);
             }
         }
-    }
+    }  
     
     public function createConsumible() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
-            $nombre_proveedor = $_POST['nombre_proveedor'];
-            $modelo = $_POST['modelo'];
-            $serie_codigo = $_POST['serie_codigo'];
             $marca = $_POST['marca'];
             $unidad_medida = $_POST['unidad_medida'];
-            $tamano = $_POST['tamano'];
-            $color = $_POST['color'];
-            $estado_fisico_actual = $_POST['estado_fisico_actual'];
             $observacion = $_POST['observacion'];
             $fecha_vencimiento = $_POST['fecha_vencimiento'];
-            $lote = $_POST['lote'];
-            $precio = $_POST['precio']; 
-            $stock = $_POST['stock']; 
-            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : []; 
-    
+            $precio = $_POST['precio'];
+            $stock = $_POST['stock'];
+            $coste = $_POST['coste']; // Campo coste agregado
+            $categoria = $_POST['categoria']; // Campo categoría agregado
+            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : [];
+            
+            // Llamar al método del modelo con el nuevo campo coste
             $consumibleId = $this->model->createConsumible(
-                $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote, $precio, $stock  // Nuevo campo
+                $nombre, $descripcion_consumible, $marca, $unidad_medida, $observacion, $fecha_vencimiento, $precio, $stock, $coste, $categoria
             );
-
+            
             if ($consumibleId) {
-                $this->model->assignCategoriasToConsumible($consumibleId, $categorias); 
+                $this->model->assignCategoriasToConsumible($consumibleId, $categorias);
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
                 exit;
             } else {
                 echo "Failed to create consumible.";
             }
         } else {
-            $categorias = $this->model->getAllCategorias(); 
+            $categorias = $this->model->getAllCategorias();
             $this->loadView('arsenal.createConsumible', ['categorias' => $categorias]);
         }
     }
-    
-    
-    
-    
     public function editConsumible() {
         $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
-            $nombre_proveedor = $_POST['nombre_proveedor'];
-            $modelo = $_POST['modelo'];
-            $serie_codigo = $_POST['serie_codigo'];
             $marca = $_POST['marca'];
             $unidad_medida = $_POST['unidad_medida'];
-            $tamano = $_POST['tamano'];
-            $color = $_POST['color'];
-            $estado_fisico_actual = $_POST['estado_fisico_actual'];
             $observacion = $_POST['observacion'];
             $fecha_vencimiento = $_POST['fecha_vencimiento'];
-            $lote = $_POST['lote'];
-            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : []; // Suponiendo que recibes las categorías como un array
-
+            $precio = $_POST['precio'];
+            $stock = $_POST['stock'];
+            $coste = $_POST['coste']; 
+            $categoria = $_POST['categoria']; 
+            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : [];
+            
             $this->model->updateConsumible(
-                $id, $nombre, $descripcion_consumible, $nombre_proveedor, $modelo, $serie_codigo, $marca, $unidad_medida, $tamano, $color, $categoria, $estado_fisico_actual, $observacion, $fecha_vencimiento, $lote
+                $id, $nombre, $descripcion_consumible, $marca, $unidad_medida, $observacion, $fecha_vencimiento, $precio, $stock, $coste, $categoria
             );
             $this->model->assignCategoriasToConsumible($id, $categorias);
-    
+            
             header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
         } else {
             $consumible = $this->model->getConsumibleById($id);
-            $this->loadView('arsenal.editConsumible', ['consumible' => $consumible]);
+            $categorias = $this->model->getAllCategorias(); 
+            $this->loadView('arsenal.editConsumible', ['consumible' => $consumible, 'categorias' => $categorias]);
         }
     }
-
     
     public function deleteBien() {
         $id = $_GET['id'];

@@ -1,20 +1,21 @@
 <?php
 
 require_once 'BaseController.php';
-require_once __DIR__ . '/../model/login.php';
+require_once __DIR__ . '/../model/Login.php';
 
-class loginController extends BaseController {
+class LoginController extends BaseController {
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $password = $_POST['password'];
+            $correo = $_POST['correo'];
+            $contrasena = $_POST['contrasena'];
             
-            $loginModel = new login();
-            $user = $loginModel->authenticate($username, $password);
-
+            $loginModel = new Login();
+            $user = $loginModel->authenticate($correo, $contrasena);
+    
             if ($user) {
                 session_start();
-                $_SESSION['username'] = $username;
+                $_SESSION['correo'] = $user['correo'];
+                $_SESSION['nombres'] = $user['nombres'];
                 header('Location: /gestion/app/controller/dashboardController.php?action=showDashboard');
                 exit();
             } else {
@@ -23,11 +24,12 @@ class loginController extends BaseController {
             }
         }
     }
+    
 }
-
 if (isset($_GET['action'])) {
-    $controller = new loginController();
+    $controller = new LoginController();
     $action = $_GET['action'];
     $controller->$action();
 }
+
 ?>

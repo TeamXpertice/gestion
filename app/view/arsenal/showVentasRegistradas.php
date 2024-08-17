@@ -32,7 +32,7 @@ if (!empty($ventas)) {
                     <tr>
                         <th>Nombre</th>
                         <th>Cantidad</th>
-                        <th>Total</th>
+                        <th>Precio Total</th>
                         <th>Fecha</th>
                     </tr>
                 </thead>
@@ -40,10 +40,10 @@ if (!empty($ventas)) {
                     <?php if (!empty($ventas)): ?>
                         <?php foreach ($ventas as $venta): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($venta['nombre'] ?? ''); ?></td>
-                            <td><?php echo htmlspecialchars($venta['cantidad'] ?? ''); ?></td>
-                            <td><?php echo htmlspecialchars($venta['total'] ?? ''); ?></td>
-                            <td><?php echo htmlspecialchars($venta['fecha'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($venta['nombre'] ); ?></td>
+                            <td><?php echo htmlspecialchars($venta['cantidad'] ); ?></td>
+                            <td><?php echo htmlspecialchars($venta['total'] ); ?></td>
+                            <td><?php echo htmlspecialchars($venta['fecha'] ); ?></td>
                         </tr>
                         <?php endforeach; ?>
                     <?php else: ?>

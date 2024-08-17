@@ -10,45 +10,17 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Compras Registradas</h1>
+
+        <div class="table-responsive">
+
+        <h1>Compras Dasboard</h1>
+        <p>Usuario: <strong><?php echo htmlspecialchars($_SESSION['nombres'] ?? 'Invitado'); ?></strong></p>
+        <h6>Registrar nueva Compras</h6>
+
         <div class="mb-4">
             <button class="btn btn-primary" data-toggle="modal" data-target="#createCompraModal">Registrar Nueva Compra</button>
         </div>
-        <div class="table-responsive">
-            <table id="comprasTable" class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Descripción</th>
-                        <th>Cantidad</th>
-                        <th>Costo Unitario</th>
-                        <th>Total</th>
-                        <th>Fecha</th>
-                        <th>Proveedor</th>
-                        <th>Método de Pago</th>
-                        <th>Observación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($compras)): ?>
-                        <?php foreach ($compras as $compra): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($compra['descripcion_compra']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['cantidad']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['costo_unitario']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['total']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['fecha']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['proveedor']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['metodo_pago']); ?></td>
-                            <td><?php echo htmlspecialchars($compra['observacion']); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="8" class="text-center">No hay compras registradas.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+        
         </div>
     </div>
 
@@ -77,7 +49,7 @@
                 <input type="text" class="form-control" id="costo_unitario" name="costo_unitario" required>
             </div>
             <div class="form-group">
-                <label for="fecha">Fecha</label>
+                <label for="fecha">Fecha de Compra</label>
                 <input type="date" class="form-control" id="fecha" name="fecha" required>
             </div>
             <div class="form-group">
@@ -85,8 +57,13 @@
                 <input type="text" class="form-control" id="proveedor" name="proveedor">
             </div>
             <div class="form-group">
-                <label for="metodo_pago">Método de Pago</label>
-                <input type="text" class="form-control" id="metodo_pago" name="metodo_pago">
+                <label for="metodo_pago">Método de Pago:</label>
+                <select id="metodo_pago" name="metodo_pago" class="form-control">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Visa">Visa</option>
+                    <option value="Yape">Yape</option>
+                    <option value="Plin">Plin</option>
+                </select>
             </div>
             <div class="form-group">
                 <label for="observacion">Observación</label>

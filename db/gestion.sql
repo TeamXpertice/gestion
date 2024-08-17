@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-08-2024 a las 19:36:32
+-- Tiempo de generación: 17-08-2024 a las 11:00:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -24,22 +24,49 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `administradores`
+--
+
+CREATE TABLE `administradores` (
+  `id` int(11) NOT NULL,
+  `nombres` varchar(255) NOT NULL,
+  `apellidos` varchar(255) NOT NULL,
+  `correo` varchar(255) NOT NULL,
+  `contrasena` varchar(255) NOT NULL,
+  `dni` varchar(20) NOT NULL,
+  `celular` varchar(20) NOT NULL,
+  `fecha_nacimiento` date NOT NULL,
+  `direccion` text NOT NULL,
+  `ocupacion` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `administradores`
+--
+
+INSERT INTO `administradores` (`id`, `nombres`, `apellidos`, `correo`, `contrasena`, `dni`, `celular`, `fecha_nacimiento`, `direccion`, `ocupacion`) VALUES
+(1, 'Administrador Principal', 'Administrador Principal', 'admin@gmail.com', 'admin', '99999999', '666666666', '2000-01-01', 'No hay descripción', 'Administrador Principal');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `bienes`
 --
 
 CREATE TABLE `bienes` (
   `id` int(11) NOT NULL,
-  `nombre_proveedor` varchar(255) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `modelo` varchar(255) DEFAULT NULL,
-  `serie_codigo` varchar(255) DEFAULT NULL,
-  `marca` varchar(255) DEFAULT NULL,
   `descripcion_bien` varchar(255) NOT NULL,
-  `unidad_medida` varchar(255) NOT NULL,
-  `tamano` varchar(255) NOT NULL,
+  `nombre_proveedor` varchar(255) DEFAULT 'Sin Registro',
+  `modelo` varchar(255) DEFAULT NULL,
+  `serie_codigo` varchar(255) DEFAULT 'Sin Registro',
+  `marca` varchar(255) DEFAULT NULL,
+  `estado` varchar(255) NOT NULL,
+  `dimensiones` varchar(255) NOT NULL,
   `color` varchar(255) NOT NULL,
   `tipo_material` varchar(255) NOT NULL,
   `estado_fisico_actual` varchar(255) NOT NULL,
+  `cantidad` int(11) DEFAULT NULL,
+  `coste` decimal(10,2) NOT NULL DEFAULT 0.00,
   `observacion` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -47,9 +74,8 @@ CREATE TABLE `bienes` (
 -- Volcado de datos para la tabla `bienes`
 --
 
-INSERT INTO `bienes` (`id`, `nombre_proveedor`, `nombre`, `modelo`, `serie_codigo`, `marca`, `descripcion_bien`, `unidad_medida`, `tamano`, `color`, `tipo_material`, `estado_fisico_actual`, `observacion`) VALUES
-(7, '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12'),
-(8, '2', '2', '2', '2', '1', '1', '1', '1', '1', '1', '1', '1');
+INSERT INTO `bienes` (`id`, `descripcion_bien`, `nombre_proveedor`, `modelo`, `serie_codigo`, `marca`, `estado`, `dimensiones`, `color`, `tipo_material`, `estado_fisico_actual`, `cantidad`, `coste`, `observacion`) VALUES
+(9, 'Maquina para hacer cafe', 'Sin Registro', 'Modelo XV', 'Sin Registro', 'Express', 'Deteriorado', '30cm de alto, 20cm de ancho', 'Negro', 'Plastificado', 'Deteriorado', 1, 300.00, 'Deteriorado el calentador');
 
 -- --------------------------------------------------------
 
@@ -96,11 +122,19 @@ CREATE TABLE `compras` (
   `cantidad` int(11) NOT NULL,
   `costo_unitario` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
-  `fecha` date NOT NULL,
-  `proveedor` varchar(255) DEFAULT NULL,
-  `metodo_pago` varchar(255) DEFAULT NULL,
+  `fecha_compra` date DEFAULT curdate(),
+  `proveedor` varchar(255) DEFAULT 'Sin Registro',
+  `metodo_pago` enum('Efectivo','Visa','Yape','Plin') DEFAULT 'Efectivo',
   `observacion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `compras`
+--
+
+INSERT INTO `compras` (`id`, `descripcion_compra`, `cantidad`, `costo_unitario`, `total`, `fecha_compra`, `proveedor`, `metodo_pago`, `observacion`) VALUES
+(1, 'Tijeras', 1, 2.00, 2.00, '2024-08-17', 'Sin datos', 'Efectivo', 'Ninguna'),
+(2, 'Palta por kilo', 2, 6.00, 12.00, '2024-08-17', 'Sin datos', 'Yape', 'Ninguna');
 
 -- --------------------------------------------------------
 
@@ -112,28 +146,25 @@ CREATE TABLE `consumibles` (
   `id` int(11) NOT NULL,
   `nombre` varchar(255) DEFAULT NULL,
   `descripcion_consumible` text DEFAULT NULL,
-  `nombre_proveedor` varchar(255) DEFAULT NULL,
-  `modelo` varchar(255) DEFAULT NULL,
-  `serie_codigo` varchar(255) DEFAULT NULL,
-  `marca` varchar(255) DEFAULT NULL,
-  `unidad_medida` varchar(255) DEFAULT NULL,
-  `tamano` varchar(255) DEFAULT NULL,
-  `color` varchar(255) DEFAULT NULL,
-  `estado_fisico_actual` varchar(255) DEFAULT NULL,
-  `observacion` text DEFAULT NULL,
-  `fecha_vencimiento` date DEFAULT NULL,
-  `lote` varchar(255) DEFAULT NULL,
   `stock` int(11) DEFAULT NULL,
-  `precio` decimal(10,2) DEFAULT NULL
+  `unidad_medida` varchar(255) DEFAULT NULL,
+  `marca` varchar(255) DEFAULT NULL,
+  `observacion` text DEFAULT NULL,
+  `fecha_compra` date DEFAULT curdate(),
+  `fecha_vencimiento` date DEFAULT NULL,
+  `coste` decimal(10,2) DEFAULT NULL,
+  `precio` decimal(10,2) DEFAULT NULL,
+  `categoria_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `consumibles`
 --
 
-INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `nombre_proveedor`, `modelo`, `serie_codigo`, `marca`, `unidad_medida`, `tamano`, `color`, `estado_fisico_actual`, `observacion`, `fecha_vencimiento`, `lote`, `stock`, `precio`) VALUES
-(8, 'Galletas oreo', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2024-08-16', '1', 994, 100.00),
-(9, 'Maquina de crey', '12', '12', '12', '12', '12', '12', '12', '12', '12', '12', '2024-08-21', '12', 10, 12.00);
+INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `stock`, `unidad_medida`, `marca`, `observacion`, `fecha_compra`, `fecha_vencimiento`, `coste`, `precio`, `categoria_id`) VALUES
+(10, 'Galletas oreo', 'Galletas de oreo', 29, 'Unidad', 'Oreo', 'Ninguna', '2024-08-17', '2024-08-29', 5.00, 6.00, NULL),
+(11, 'Galletas vanilla', 'Galletas vanilla', 30, 'Unidad', 'Oreo', 'Ninguna', '2024-08-17', '2024-08-24', 1.00, 3.00, NULL),
+(12, 'Galletas Fresa', 'Galletas Fresa', 30, 'Unidad', 'Oreo', 'Ninguna', '2024-08-17', '2024-08-30', 2.00, 4.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -151,8 +182,9 @@ CREATE TABLE `consumibles_categorias` (
 --
 
 INSERT INTO `consumibles_categorias` (`consumible_id`, `categoria_id`) VALUES
-(8, 4),
-(9, 5);
+(10, 4),
+(11, 4),
+(12, 4);
 
 -- --------------------------------------------------------
 
@@ -164,34 +196,6 @@ CREATE TABLE `renta` (
   `id` int(11) NOT NULL,
   `descipcion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `users`
---
-
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `nombres` varchar(255) NOT NULL,
-  `apellidos` varchar(255) NOT NULL,
-  `dni` varchar(20) NOT NULL,
-  `celular` varchar(20) NOT NULL,
-  `fecha_nacimiento` date NOT NULL,
-  `correo` varchar(255) NOT NULL,
-  `direccion` text NOT NULL,
-  `ocupacion` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `users`
---
-
-INSERT INTO `users` (`id`, `username`, `password`, `nombres`, `apellidos`, `dni`, `celular`, `fecha_nacimiento`, `correo`, `direccion`, `ocupacion`) VALUES
-(1, 'admin', 'admin', 'Juan', 'Pérez', '12345678', '999999999', '1980-01-01', 'admin@base.com', 'Calle Falsa 123', 'Ingeniero'),
-(2, 'usuario2', 'password2', 'María', 'Gómez', '87654321', '888888888', '1990-02-02', 'maria.gomez@example.com', 'Avenida Siempre Viva 456', 'Doctora');
 
 -- --------------------------------------------------------
 
@@ -211,14 +215,7 @@ CREATE TABLE `ventas` (
 --
 
 INSERT INTO `ventas` (`id`, `total`, `fecha`, `created_at`) VALUES
-(2, 100.00, '2024-08-09', '2024-08-09 19:06:01'),
-(3, 100.00, '2024-08-09', '2024-08-09 19:07:36'),
-(4, 100.00, '2024-08-09', '2024-08-09 20:57:49'),
-(5, 100.00, '2024-08-09', '2024-08-09 20:59:15'),
-(6, 100.00, '2024-08-09', '2024-08-10 02:26:27'),
-(7, 12.00, '2024-08-10', '2024-08-11 02:28:12'),
-(8, 12.00, '2024-08-14', '2024-08-15 01:26:02'),
-(9, 100.00, '2024-08-15', '2024-08-16 03:35:47');
+(10, 1.00, '2024-08-17', '2024-08-17 07:42:26');
 
 -- --------------------------------------------------------
 
@@ -239,18 +236,17 @@ CREATE TABLE `ventas_detalles` (
 --
 
 INSERT INTO `ventas_detalles` (`id`, `venta_id`, `consumible_id`, `cantidad`, `precio_unitario`) VALUES
-(3, 2, 8, 1, 100.00),
-(4, 3, 8, 1, 100.00),
-(5, 4, 8, 1, 100.00),
-(6, 5, 8, 1, 100.00),
-(7, 6, 8, 1, 100.00),
-(8, 7, 9, 1, 12.00),
-(9, 8, 9, 1, 12.00),
-(10, 9, 8, 1, 100.00);
+(11, 10, 10, 1, 1.00);
 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `administradores`
+--
+ALTER TABLE `administradores`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `bienes`
@@ -296,12 +292,6 @@ ALTER TABLE `renta`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indices de la tabla `ventas`
 --
 ALTER TABLE `ventas`
@@ -320,10 +310,16 @@ ALTER TABLE `ventas_detalles`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `administradores`
+--
+ALTER TABLE `administradores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT de la tabla `bienes`
 --
 ALTER TABLE `bienes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `categorias`
@@ -341,13 +337,13 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `compras`
 --
 ALTER TABLE `compras`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `consumibles`
 --
 ALTER TABLE `consumibles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `renta`
@@ -356,22 +352,16 @@ ALTER TABLE `renta`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas_detalles`
 --
 ALTER TABLE `ventas_detalles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Restricciones para tablas volcadas
