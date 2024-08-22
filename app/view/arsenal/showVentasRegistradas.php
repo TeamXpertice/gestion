@@ -6,6 +6,7 @@ if (!empty($ventas)) {
         $totalGanancia += $venta['total'];
     }
 }
+
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
@@ -76,8 +77,8 @@ if (!empty($ventas)) {
         $(document).ready(function() {
             var table = $('#ventasTable').DataTable({
                 language: {
-                    url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json" 
-                },
+    url: "https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+},
                 dom: 'Bfrtip', 
                 buttons: [
                     {

@@ -82,10 +82,6 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="descripcion_bien">Descripción:</label>
-                    <textarea id="descripcion_bien" name="descripcion_bien" class="form-control descripcion_bien" required></textarea>
-                </div>
-                <div class="form-group col-md-6">
                     <label for="observacion">Observación:</label>
                     <textarea id="observacion" name="observacion" class="form-control observacion"></textarea>
                 </div>

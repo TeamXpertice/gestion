@@ -82,22 +82,12 @@ INSERT INTO `bienes` (`id`, `descripcion_bien`, `nombre_proveedor`, `modelo`, `s
 --
 -- Estructura de tabla para la tabla `categorias`
 --
-
 CREATE TABLE `categorias` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `categorias`
---
-
-INSERT INTO `categorias` (`id`, `nombre`) VALUES
-(1, 'Electrónicos'),
-(2, 'Papel'),
-(3, 'Alimentos'),
-(4, 'Galleta'),
-(5, 'prueba1');
 
 -- --------------------------------------------------------
 
@@ -143,7 +133,7 @@ INSERT INTO `compras` (`id`, `descripcion_compra`, `cantidad`, `costo_unitario`,
 --
 
 CREATE TABLE `consumibles` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) DEFAULT NULL,
   `descripcion_consumible` text DEFAULT NULL,
   `stock` int(11) DEFAULT NULL,
@@ -154,17 +144,13 @@ CREATE TABLE `consumibles` (
   `fecha_vencimiento` date DEFAULT NULL,
   `coste` decimal(10,2) DEFAULT NULL,
   `precio` decimal(10,2) DEFAULT NULL,
-  `categoria_id` int(11) DEFAULT NULL
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `consumibles`
 --
 
-INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `stock`, `unidad_medida`, `marca`, `observacion`, `fecha_compra`, `fecha_vencimiento`, `coste`, `precio`, `categoria_id`) VALUES
-(10, 'Galletas oreo', 'Galletas de oreo', 29, 'Unidad', 'Oreo', 'Ninguna', '2024-08-17', '2024-08-29', 5.00, 6.00, NULL),
-(11, 'Galletas vanilla', 'Galletas vanilla', 30, 'Unidad', 'Oreo', 'Ninguna', '2024-08-17', '2024-08-24', 1.00, 3.00, NULL),
-(12, 'Galletas Fresa', 'Galletas Fresa', 30, 'Unidad', 'Oreo', 'Ninguna', '2024-08-17', '2024-08-30', 2.00, 4.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -172,19 +158,17 @@ INSERT INTO `consumibles` (`id`, `nombre`, `descripcion_consumible`, `stock`, `u
 -- Estructura de tabla para la tabla `consumibles_categorias`
 --
 
+
 CREATE TABLE `consumibles_categorias` (
   `consumible_id` int(11) NOT NULL,
-  `categoria_id` int(11) NOT NULL
+  `categoria_id` int(11) NOT NULL,
+  PRIMARY KEY (`consumible_id`, `categoria_id`),
+  FOREIGN KEY (`consumible_id`) REFERENCES `consumibles`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`categoria_id`) REFERENCES `categorias`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Volcado de datos para la tabla `consumibles_categorias`
 --
-
-INSERT INTO `consumibles_categorias` (`consumible_id`, `categoria_id`) VALUES
-(10, 4),
-(11, 4),
-(12, 4);
 
 -- --------------------------------------------------------
 
@@ -212,10 +196,6 @@ CREATE TABLE `ventas` (
 
 --
 -- Volcado de datos para la tabla `ventas`
---
-
-INSERT INTO `ventas` (`id`, `total`, `fecha`, `created_at`) VALUES
-(10, 1.00, '2024-08-17', '2024-08-17 07:42:26');
 
 -- --------------------------------------------------------
 
@@ -235,8 +215,6 @@ CREATE TABLE `ventas_detalles` (
 -- Volcado de datos para la tabla `ventas_detalles`
 --
 
-INSERT INTO `ventas_detalles` (`id`, `venta_id`, `consumible_id`, `cantidad`, `precio_unitario`) VALUES
-(11, 10, 10, 1, 1.00);
 
 --
 -- Índices para tablas volcadas

@@ -59,15 +59,18 @@
                     <input type="date" id="fecha_compra" name="fecha_compra" class="form-control" value="<?php echo htmlspecialchars($consumible['fecha_compra']); ?>">
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="categoria">Categoría:</label>
-                    <select id="categoria" name="categoria" class="form-control">
-                        <?php foreach ($categorias as $categoria): ?>
-                            <option value="<?php echo htmlspecialchars($categoria['id']); ?>" <?php echo ($consumible['categoria_id'] == $categoria['id']) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($categoria['nombre']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <label for="categoria">Categoría:</label>
+                <select id="categoria" name="categoria" class="form-control">
+                    <?php foreach ($categorias as $categoria): ?>
+                        <option value="<?php echo htmlspecialchars($categoria['id']); ?>" <?php echo ($selectedCategoria == $categoria['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+
+
             </div>
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         </form>

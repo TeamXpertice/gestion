@@ -71,38 +71,45 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="nueva_categoria">Agregar nueva categoría:</label>
-                    <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
-                    <button type="button" id="agregar_categoria" class="btn btn-secondary mt-2">Agregar</button>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
-    </div>
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-        $(document).ready(function() {
-            $('#agregar_categoria').click(function() {
-                var nuevaCategoria = $('#nueva_categoria').val();
-                if (nuevaCategoria.trim() === '') {
-                    alert('Por favor ingrese una categoría.');
-                    return;
-                }
 
-                $.post('/gestion/app/controller/ArsenalController.php?action=addCategoria', { nombre: nuevaCategoria }, function(response) {
-                    if (response.success) {
-                        $('#nueva_categoria').val('');
-                        $('#categoria').append('<option value="' + response.id + '">' + response.nombre + '</option>');
-                        alert('Categoría agregada con éxito.');
-                    } else {
-                        alert('Error al agregar categoría.');
-                    }
-                }, 'json');
-            });
+
+<div class="form-group col-md-4">
+    <label for="nuevaCategoria">Nueva Categoría</label>
+    <input type="text" id="nuevaCategoria" name="nuevaCategoria" class="form-control">
+    <button type="button" id="addCategoriaBtn">Agregar</button>
+</div>
+</div>
+<button type="submit" class="btn btn-primary">Guardar</button>
+<script>
+document.getElementById('addCategoriaBtn').addEventListener('click', function () {
+    const nuevaCategoria = document.getElementById('nuevaCategoria').value;
+    
+    if (nuevaCategoria) {
+        fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `nombre=${encodeURIComponent(nuevaCategoria)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById('categoria');
+                const option = document.createElement('option');
+                option.value = data.id;
+                option.text = data.nombre;
+                select.add(option);
+                select.value = data.id;
+            } else {
+                alert('Error al agregar la categoría.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+    }
+});
 </script>
-
 </body>
 </html>
