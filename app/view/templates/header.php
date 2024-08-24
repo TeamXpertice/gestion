@@ -64,7 +64,6 @@
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="arsenalDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Arsenal</a>
                     <div class="dropdown-menu" aria-labelledby="arsenalDropdown">
-                        <!-- <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showArsenal">Ver arsenal</a> -->
                         <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showVentaConsumible">Vender</a>
                         <a class="dropdown-ietem" href="/gestion/app/controller/ArsenalController.php?action=showVentasRegistradas">Ver Registro del dia</a>
                         <a class="dropdown-item" href="/gestion/app/controller/ArsenalController.php?action=showConsumible">Productos</a>
@@ -87,4 +86,4 @@
         </div>
         <div class="content flex-grow-1">
         </div>
-    </div>
+    </div>

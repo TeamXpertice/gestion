@@ -27,22 +27,7 @@ class ArsenalController extends BaseController {
         'bienes' => $bienes, 
         'nombre' => $nombre]);
     }
-    public function showVentasRegistradas() {
-        $nombre = $this->checkLogin();
-        $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
-        $ventas = $this->model->getVentasPorFecha($selectedDate);
-    
-        if (!$ventas) {
-            echo '<p>No se encontraron ventas para esta fecha.</p>';
-            return;
-        }
-    
-        $this->loadView('arsenal/showVentasRegistradas', [
-            'ventas' => $ventas, 
-            'selectedDate' => $selectedDate, 
-            'nombre' => $nombre
-        ]);
-    }
+
     
     public function showConsumible() {
         $nombre = $this->checkLogin();
@@ -73,7 +58,23 @@ class ArsenalController extends BaseController {
         ]);
     }
 
-    
+    // Asegúrate de que todas las funciones estén bien declaradas
+    public function showVentasRegistradas() {
+        $nombre = $this->checkLogin();
+        date_default_timezone_set('America/Lima');
+        $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+        $ventas = $this->model->getVentasPorFecha($selectedDate);
+
+        $this->loadView('arsenal/showVentasRegistradas', [
+            'ventas' => $ventas, 
+            'selectedDate' => $selectedDate, 
+            'nombre' => $nombre
+        ]);
+    }
+////////////////////////////////////////////////ALMACENES///////////////////////////////////////////////////
+ 
+
+
 
     
     public function createConsumible() {
@@ -107,10 +108,8 @@ class ArsenalController extends BaseController {
     }
     
     public function editConsumible() {
-        $id = $_GET['id']; // Get the consumible ID from the query parameters
-    
+        $id = $_GET['id']; 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Form submission
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
             $marca = $_POST['marca'];
@@ -147,6 +146,7 @@ class ArsenalController extends BaseController {
     
     
 ////////////////////////////////////////////////GET///////////////////////////////////////////////////
+
 
 public function getConsumiblesPorCategoria() {
     $categoriaId = $_GET['categoria_id'];
@@ -246,6 +246,8 @@ public function getConsumiblesPorCategoria() {
         $this->model->deleteBien($id);
         header('Location: /gestion/app/controller/ArsenalController.php?action=showBien');
     }
+
+    
     public function createVentaConsumible() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $productosSeleccionados = isset($_POST['productosSeleccionados']) ? json_decode($_POST['productosSeleccionados'], true) : [];

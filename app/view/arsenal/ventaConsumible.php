@@ -19,9 +19,11 @@
             display: inline-block;
             width: 100%;
         }
+
         .category-button:hover {
             opacity: 0.8;
         }
+
         .category-red { background-color: #e74c3c; }
         .category-blue { background-color: #3498db; }
         .category-green { background-color: #2ecc71; }
@@ -29,6 +31,11 @@
         .category-purple { background-color: #9b59b6; }
         .category-teal { background-color: #1abc9c; }
         .category-yellow { background-color: #f1c40f; }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -38,11 +45,10 @@
             <div class="col-md-6">
                 <h3>Tipos de Material</h3>
                 <div class="row" id="materialList">
-                    <?php 
-                    $colors = ['red', 'blue', 'green', 'orange', 'purple', 'teal', 'yellow']; 
+                    <?php
+                    $colors = ['red', 'blue', 'green', 'orange', 'purple', 'teal', 'yellow'];
                     $numColumns = 7;
                     $colWidth = 12 / $numColumns;
-                    $columnIndex = 0;
 
                     if (!empty($categorias)) {
                         foreach ($categorias as $index => $categoria):
@@ -56,7 +62,7 @@
                                     <?php echo htmlspecialchars($categoria['nombre']); ?>
                                 </button>
                             </div>
-                    <?php 
+                    <?php
                         endforeach;
                     } else {
                         echo "<p>No se encontraron categorías.</p>";
@@ -82,31 +88,36 @@
         </div>
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
-    
+
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
+
     <script>
         var productosSeleccionados = [];
 
         $('#ventaForm').on('submit', function(e) {
             e.preventDefault();
-            
+
+            if (productosSeleccionados.length === 0) {
+                alert('Debes seleccionar al menos un producto para registrar la venta.');
+                return;
+            }
+
             $.ajax({
                 url: '/gestion/app/controller/ArsenalController.php?action=createVentaConsumible',
                 type: 'POST',
-                data: { productosSeleccionados: JSON.stringify(productosSeleccionados) }, // Enviar JSON como cadena
+                data: { productosSeleccionados: JSON.stringify(productosSeleccionados) },
                 success: function(response) {
                     var result = JSON.parse(response);
-                    
+
                     if (result.success) {
                         alert(result.success);
-                        // Limpiar campos y vista previa
-                        productosSeleccionados = [];
-                        actualizarPrevisualizacion();
+                        productosSeleccionados = []; // Limpiar productos seleccionados
+                        actualizarPrevisualizacion(); // Actualizar la vista previa
                         $('#ventaForm')[0].reset(); // Limpiar el formulario
+                        mostrarConsumiblesPorCategoria($('#categoriaActual').val()); // Recargar lista de productos
                     } else if (result.error) {
                         alert(result.error);
                     }
@@ -119,6 +130,8 @@
         });
 
         function mostrarConsumiblesPorCategoria(categoriaId) {
+            $('#categoriaActual').val(categoriaId); // Guardar la categoría seleccionada
+
             $.ajax({
                 url: '/gestion/app/controller/ArsenalController.php',
                 type: 'GET',
@@ -127,13 +140,15 @@
                     categoria_id: categoriaId
                 },
                 success: function(response) {
-                    console.log(response); 
+                    console.log(response);
                     try {
                         var consumibles = JSON.parse(response);
                         var html = '<table class="table table-bordered"><thead class="thead-dark"><tr><th>Nombre</th><th>Stock</th><th>Precio</th><th>Acción</th></tr></thead><tbody>';
                         consumibles.forEach(function(consumible) {
                             var precio = parseFloat(consumible.precio);
-                            html += '<tr><td>' + consumible.nombre + '</td><td>' + consumible.stock + '</td><td>' + precio.toFixed(2) + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + precio.toFixed(2) + ', ' + consumible.stock + ')">Agregar</button></td></tr>';
+                            var stock = parseInt(consumible.stock);
+                            var classDisabled = stock <= 0 ? 'disabled' : '';
+                            html += '<tr class="' + classDisabled + '"><td>' + consumible.nombre + '</td><td>' + stock + '</td><td>' + precio.toFixed(2) + '</td><td><button type="button" class="btn btn-success" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + precio.toFixed(2) + ', ' + stock + ')">Agregar</button></td></tr>';
                         });
                         html += '</tbody></table>';
                         $('#consumiblesList').html(html);
@@ -158,7 +173,13 @@
                     alert('No puedes agregar más de este producto. Stock máximo alcanzado.');
                 }
             } else {
-                productosSeleccionados.push({ id: id, nombre: nombre, precio: precio, cantidad: 1, stock: stock });
+                productosSeleccionados.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad: 1,
+                    stock: stock
+                });
             }
             actualizarPrevisualizacion();
         }
@@ -170,10 +191,10 @@
                 productosSeleccionados.forEach(function(producto, index) {
                     var subtotal = producto.precio * producto.cantidad;
                     total += subtotal;
-                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">' + producto.nombre + ' - Cantidad: ' + producto.cantidad + 
-                            '<span><button type="button" class="btn btn-sm btn-primary" onclick="incrementarCantidad(' + index + ')">+</button> ' + 
-                            '<button type="button" class="btn btn-sm btn-danger" onclick="decrementarCantidad(' + index + ')">-</button></span>' +
-                            '<span class="badge badge-primary badge-pill">$' + subtotal.toFixed(2) + '</span></li>';
+                    html += '<li class="list-group-item d-flex justify-content-between align-items-center">' + producto.nombre + ' - Cantidad: ' + producto.cantidad +
+                        '<span><button type="button" class="btn btn-sm btn-primary" onclick="incrementarCantidad(' + index + ')">+</button> ' +
+                        '<button type="button" class="btn btn-sm btn-danger" onclick="decrementarCantidad(' + index + ')">-</button></span>' +
+                        '<span class="badge badge-primary badge-pill">$' + subtotal.toFixed(2) + '</span></li>';
                 });
                 html += '</ul>';
             } else {
@@ -184,7 +205,7 @@
 
             $('#totalVenta').html('<h4>Total: $' + total.toFixed(2) + '</h4>');
         }
-
+       
         function incrementarCantidad(index) {
             if (productosSeleccionados[index].cantidad < productosSeleccionados[index].stock) {
                 productosSeleccionados[index].cantidad++;
@@ -199,8 +220,10 @@
                 productosSeleccionados[index].cantidad--;
                 actualizarPrevisualizacion();
             } else {
-                productosSeleccionados.splice(index, 1);
-                actualizarPrevisualizacion();
+                if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                    productosSeleccionados.splice(index, 1);
+                    actualizarPrevisualizacion();
+                }
             }
         }
     </script>
