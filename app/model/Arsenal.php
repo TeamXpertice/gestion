@@ -410,6 +410,7 @@ public function assignCategoriasToConsumible($consumibleId, $categorias)
     // }
 
     // Obtener consumibles por categoría
+    
     public function getCategorias() {
         $sql = "SELECT * FROM categorias";
         $stmt = $this->db->prepare($sql);

@@ -1,0 +1,20 @@
+Array
+(
+    [descripcion] => 
+    [cantidad] => 
+    [costo_unitario] => 
+    [fecha] => 
+    [proveedor] => 
+    [metodo_pago] => Efectivo
+    [observacion] => 
+)
+Array
+(
+    [descripcion] => 
+    [cantidad] => 
+    [costo_unitario] => 
+    [fecha] => 
+    [proveedor] => 
+    [metodo_pago] => Efectivo
+    [observacion] => 
+)
