@@ -24,6 +24,7 @@ class ComprasController extends BaseController {
     // Muestra la vista con las compras registradas
     public function showRegistroCompras() {
         $nombre = $this->checkLogin();
+        date_default_timezone_set('America/Lima');
         $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
         $compras = $this->model->getComprasByDate($date);
         $totalPorMetodo = $this->model->getTotalPorMetodoPago($date);
@@ -34,8 +35,26 @@ class ComprasController extends BaseController {
             'totalPorMetodo' => $totalPorMetodo
         ]);
     }
-
-    // Registra una nueva compra
+    public function registrarCompraConsumibles($productos, $proveedor, $metodo_pago) {
+        foreach ($productos as $producto) {
+            $consumible_id = $producto['id'] ?? null;
+            $cantidad = $producto['cantidad'] ?? null;
+            $costo_unitario = $producto['coste'] ?? null;
+            $observacion = $producto['observacion'] ?? null;
+    
+            if ($consumible_id && $cantidad && $costo_unitario) {
+                // Reponer stock del consumible
+                $this->model->reponerStock($consumible_id, $cantidad);
+    
+                // Registrar la compra del consumible
+                $this->model->registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, date('Y-m-d'), $observacion, $proveedor, $metodo_pago);
+            } else {
+                // Manejar el caso en que los datos estén incompletos
+                return false;
+            }
+        }
+        return true;
+    }
     public function createCompra() {
         $action = $_POST['action'] ?? '';
     
@@ -49,33 +68,28 @@ class ComprasController extends BaseController {
             $metodo_pago = $_POST['metodo_pago'] ?? '';
             $observacion = $_POST['observacion'] ?? '';
     
-            // Llamar a un método del modelo para registrar la compra normal
             $result = $this->model->registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $fecha, $proveedor, $metodo_pago, $observacion);
-            
             echo json_encode(['success' => $result]);
         } elseif ($action === 'consumible') {
             // Código para manejar el abastecimiento de consumibles
             $productos = json_decode($_POST['productosSeleccionados'], true);
-            foreach ($productos as $producto) {
-                $consumible_id = $producto['id'];
-                $cantidad = $producto['cantidad'];
-                $costo_unitario = $producto['coste'];
-                $observacion = $producto['observacion'];
+            $proveedor = $_POST['proveedor'] ?? '';
+            $metodo_pago = $_POST['metodo_pago'] ?? '';
     
-                // Reponer stock del consumible
-                $this->model->reponerStock($consumible_id, $cantidad);
-    
-                // Registrar la compra del consumible
-                $this->model->registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, date('Y-m-d'), $observacion);
+            if ($productos && $this->registrarCompraConsumibles($productos, $proveedor, $metodo_pago)) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'redirect' => '/gestion/app/view/registrarCompraConsumibles.php']);
             }
-    
-            echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['success' => false, 'error' => 'Acción no válida']);
+            echo json_encode(['success' => false, 'redirect' => '/gestion/app/view/registrarCompraConsumibles.php']);
         }
     }
     
     
+    
+    
+
     
 
     // Obtener los consumibles por categoría

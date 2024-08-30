@@ -4,6 +4,7 @@ class BaseModel {
     protected $db;
 
     public function __construct() {
+        date_default_timezone_set('America/Lima');
         $host = 'localhost';
         $dbname = 'gestion';
         $username = 'root';

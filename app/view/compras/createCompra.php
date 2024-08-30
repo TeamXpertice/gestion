@@ -80,7 +80,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="/gestion/app/controller/ComprasController.php?action=createCompra" method="post">
+                        <form id="compraNormalForm" method="post">
                             <div class="form-group">
                                 <label for="descripcion">Descripción</label>
                                 <input type="text" class="form-control" id="descripcion" name="descripcion" required>
@@ -164,7 +164,7 @@
                 <div id="totalCompra" class="mt-3">
                     <!-- Aquí se mostrará el total de la compra -->
                 </div>
-                <form id="compraForm" action="/gestion/app/controller/ComprasController.php?action=createCompra" method="post" class="mt-4">
+                <form id="compraConsumiblesForm" method="post">
                     <input type="hidden" id="productosSeleccionados" name="productosSeleccionados">
                     <div class="form-group">
                         <label for="metodoCompra">Método de Compra:</label>
@@ -189,47 +189,78 @@
     <script>
         var productosSeleccionados = [];
 
-        $('#compraForm').on('submit', function(e) {
+        $('#compraNormalForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '/gestion/app/controller/ComprasController.php?action=createCompra',
+                type: 'POST',
+                data: {
+                    action: 'normal',
+                    descripcion: $('#descripcion').val(),
+                    cantidad: $('#cantidad').val(),
+                    costo_unitario: $('#costo_unitario').val(),
+                    fecha: $('#fecha').val(),
+                    proveedor: $('#proveedor').val(),
+                    metodo_pago: $('#metodo_pago').val(),
+                    observacion: $('#observacion').val()
+                },
+                success: function(response) {
+                    try {
+                        var json = JSON.parse(response);
+                        if (json.success) {
+                            alert('Compra normal registrada exitosamente.');
+                            // Redirige o actualiza la vista según sea necesario
+                        } else {
+                            alert('Error: ' + json.error);
+                        }
+                    } catch (e) {
+                        console.error('Error al analizar JSON:', e);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', status, error);
+                }
+            });
+        });
+        $('#compraConsumiblesForm').on('submit', function(e) {
             e.preventDefault();
 
             if (productosSeleccionados.length === 0) {
                 alert('Debes seleccionar al menos un producto para registrar la compra.');
                 return;
             }
-
+            var nombresConsumibles = productosSeleccionados.map(function(producto) {
+                return producto.nombre; // Ajusta esto según la estructura de tus datos
+            });
             $.ajax({
-    url: '/gestion/app/controller/ComprasController.php?action=createCompra',
-    type: 'POST',
-    data: {
-        descripcion: $('#descripcion').val(),
-        cantidad: $('#cantidad').val(),
-        costo_unitario: $('#costo_unitario').val(),
-        fecha: $('#fecha').val(),
-        proveedor: $('#proveedor').val(),
-        metodo_pago: $('#metodo_pago').val(),
-        observacion: $('#observacion').val()
-    },
-    success: function(response) {
-        try {
-            var json = JSON.parse(response);
-            if (json.success) {
-                // Manejar el éxito
-                alert('Compra registrada exitosamente.');
-            } else {
-                // Manejar errores
-                alert('Error: ' + json.error);
-            }
-        } catch (e) {
-            console.error('Error al analizar JSON:', e);
-        }
-    },
-    error: function(xhr, status, error) {
-        console.error('Error en la solicitud AJAX:', status, error);
-    }
-});
-
-
+                url: '/gestion/app/controller/ComprasController.php?action=createCompra',
+                type: 'POST',
+                data: {
+                    action: 'consumible',
+                    productosSeleccionados: JSON.stringify(productosSeleccionados),
+                    proveedor: $('#proveedor').val(),
+                    metodo_pago: $('#metodo_pago').val()
+                },
+                success: function(response) {
+                    try {
+                        var json = JSON.parse(response);
+                        if (json.success) {
+                            alert('Compra de consumibles registrada exitosamente.');
+                            // Redirige o actualiza la vista según sea necesario
+                        } else {
+                            alert('Error: ' + json.error);
+                        }
+                    } catch (e) {
+                        console.error('Error al analizar JSON:', e);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', status, error);
+                }
+            });
         });
+
 
         function mostrarConsumiblesPorCategoria(categoriaId) {
             $('#categoriaActual').val(categoriaId); // Guardar la categoría seleccionada
@@ -250,12 +281,13 @@
                         if (consumibles.length > 0) {
                             html += '<ul class="list-group">';
                             consumibles.forEach(function(consumible) {
-                                var disabledClass = consumible.stock === 0 ? 'disabled' : '';
+                                // No deshabilitar si estamos en la vista de compras
+                                var disabledClass = ''; // Para compras, no deshabilitar consumibles con stock 0
                                 html += '<li class="list-group-item ' + disabledClass + '">' +
                                     '<strong>' + consumible.nombre + '</strong><br>' +
                                     'Stock: ' + consumible.stock + '<br>' +
                                     'Costo: $' + consumible.coste + '<br>' +
-                                    '<button class="btn btn-sm btn-primary mt-2 ' + disabledClass + '" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.coste + ', ' + consumible.stock + ')">Agregar</button>' +
+                                    '<button class="btn btn-sm btn-primary mt-2" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.coste + ', ' + consumible.stock + ')">Agregar</button>' +
                                     '</li>';
                             });
                             html += '</ul>';
@@ -282,23 +314,15 @@
             });
 
             if (productoExistente) {
-                if (productoExistente.cantidad < stock) {
-                    productoExistente.cantidad++;
-                } else {
-                    alert('No hay suficiente stock para agregar más unidades.');
-                }
+                productoExistente.cantidad++;
             } else {
-                if (stock > 0) {
-                    productosSeleccionados.push({
-                        id: id,
-                        nombre: nombre,
-                        cantidad: 1,
-                        coste: coste,
-                        observacion: ''
-                    });
-                } else {
-                    alert('Este producto no tiene stock disponible.');
-                }
+                productosSeleccionados.push({
+                    id: id,
+                    nombre: nombre,
+                    cantidad: 1,
+                    coste: coste,
+                    observacion: ''
+                });
             }
 
             actualizarPrevisualizacion();

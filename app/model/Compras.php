@@ -50,6 +50,31 @@ class Compras extends BaseModel {
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, $fecha, $observacion, $proveedor, $metodo_pago) {
+        // Consulta para obtener el nombre del consumible por su ID
+        $query = "SELECT nombre FROM consumibles WHERE id = :consumible_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':consumible_id', $consumible_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $consumible = $stmt->fetch(PDO::FETCH_ASSOC);
+        $nombre_consumible = $consumible['nombre'] ?? 'Compra de consumible'; // En caso de error, se mantiene la descripción genérica
+    
+        $sql = "INSERT INTO compras (descripcion_compra, cantidad, costo_unitario, total, fecha_compra, proveedor, metodo_pago, observacion)
+                VALUES (:descripcion, :cantidad, :costo_unitario, :total, :fecha, :proveedor, :metodo_pago, :observacion)";
+        $stmt = $this->db->prepare($sql);
+        $total = $cantidad * $costo_unitario;
+        $stmt->bindParam(':descripcion', $nombre_consumible);
+        $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+        $stmt->bindParam(':costo_unitario', $costo_unitario);
+        $stmt->bindParam(':total', $total);
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->bindParam(':proveedor', $proveedor);
+        $stmt->bindParam(':metodo_pago', $metodo_pago);
+        $stmt->bindParam(':observacion', $observacion);
+        return $stmt->execute();
+    }
+    
+    
     public function registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $fecha, $proveedor, $metodo_pago, $observacion) {
         try {
             $sql = "INSERT INTO compras_normales (descripcion, cantidad, costo_unitario, fecha, proveedor, metodo_pago, observacion)
@@ -99,21 +124,7 @@ class Compras extends BaseModel {
         return $stmt->execute();
     }
     
-    public function registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, $fecha, $observacion) {
-        $sql = "INSERT INTO compras (descripcion, cantidad, costo_unitario, fecha, proveedor, metodo_pago, observacion) VALUES (:descripcion, :cantidad, :costo_unitario, :fecha, :proveedor, :metodo_pago, :observacion)";
-        $stmt = $this->db->prepare($sql);
-        $descripcion = 'Compra de consumible'; // Puedes ajustar esto según sea necesario
-        $proveedor = 'Marca del consumible'; // Similar, ajusta según sea necesario
-        $metodo_pago = 'Efectivo'; // O el valor que se pase desde el formulario
-        $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
-        $stmt->bindParam(':costo_unitario', $costo_unitario);
-        $stmt->bindParam(':fecha', $fecha);
-        $stmt->bindParam(':proveedor', $proveedor);
-        $stmt->bindParam(':metodo_pago', $metodo_pago);
-        $stmt->bindParam(':observacion', $observacion);
-        return $stmt->execute();
-    }
+
     
 }
 ?>

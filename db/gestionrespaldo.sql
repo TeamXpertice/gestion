@@ -122,9 +122,6 @@ CREATE TABLE `compras` (
 -- Volcado de datos para la tabla `compras`
 --
 
-INSERT INTO `compras` (`id`, `descripcion_compra`, `cantidad`, `costo_unitario`, `total`, `fecha_compra`, `proveedor`, `metodo_pago`, `observacion`) VALUES
-(1, 'Tijeras', 1, 2.00, 2.00, '2024-08-17', 'Sin datos', 'Efectivo', 'Ninguna'),
-(2, 'Palta por kilo', 2, 6.00, 12.00, '2024-08-17', 'Sin datos', 'Yape', 'Ninguna');
 
 -- --------------------------------------------------------
 
