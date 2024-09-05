@@ -38,8 +38,10 @@ class ArsenalController extends BaseController
     {
         $nombre = $this->checkLogin();
         $consumibles = $this->model->getConsumibles();
+        $categorias = $this->model->getAllCategorias();
         $this->loadView('arsenal.showConsumible', [
             'consumibles' => $consumibles,
+            'categorias' => $categorias,
             'nombre' => $nombre
         ]);
     }
@@ -58,11 +60,9 @@ class ArsenalController extends BaseController
     {
         $nombre = $this->checkLogin();
         $consumibles = $this->model->getAllConsumibles();
-        $categorias = $this->model->getAllCategorias();
 
         $this->loadView('arsenal.ventaConsumible', [
             'consumibles' => $consumibles,
-            'categorias' => $categorias,
             'nombre' => $nombre
         ]);
     }
