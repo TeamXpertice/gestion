@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,6 +39,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container mt-1">
         <h2>Registrar Venta de Consumible</h2>
@@ -78,10 +80,23 @@
                 <div id="ventaPreview">
                     <p>No hay productos seleccionados.</p>
                 </div>
-                <div id="totalVenta" class="mt-3">
-                </div>
+                <div id="totalVenta" class="mt-3"></div>
+
+                <!-- Formulario para registrar la venta -->
                 <form id="ventaForm" action="/gestion/app/controller/ArsenalController.php?action=createVentaConsumible" method="post" class="mt-4">
                     <input type="hidden" id="productosSeleccionados" name="productosSeleccionados">
+
+
+                    <div class="form-group">
+                        <label for="metodo_pago">Método de Pago</label>
+                        <select id="metodo_pago" name="metodo_pago" class="form-control">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Visa">Visa</option>
+                            <option value="Yape">Yape</option>
+                            <option value="Plin">Plin</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Registrar Venta</button>
                 </form>
             </div>
@@ -108,16 +123,19 @@
             $.ajax({
                 url: '/gestion/app/controller/ArsenalController.php?action=createVentaConsumible',
                 type: 'POST',
-                data: { productosSeleccionados: JSON.stringify(productosSeleccionados) },
+                data: {
+                    productosSeleccionados: JSON.stringify(productosSeleccionados),
+                    metodo_pago: $('#metodo_pago').val()  
+                },
                 success: function(response) {
                     var result = JSON.parse(response);
 
                     if (result.success) {
                         alert(result.success);
-                        productosSeleccionados = []; // Limpiar productos seleccionados
-                        actualizarPrevisualizacion(); // Actualizar la vista previa
-                        $('#ventaForm')[0].reset(); // Limpiar el formulario
-                        mostrarConsumiblesPorCategoria($('#categoriaActual').val()); // Recargar lista de productos
+                        productosSeleccionados = [];
+                        actualizarPrevisualizacion();
+                        $('#ventaForm')[0].reset();
+                        mostrarConsumiblesPorCategoria($('#categoriaActual').val());
                     } else if (result.error) {
                         alert(result.error);
                     }
@@ -130,7 +148,7 @@
         });
 
         function mostrarConsumiblesPorCategoria(categoriaId) {
-            $('#categoriaActual').val(categoriaId); // Guardar la categoría seleccionada
+            $('#categoriaActual').val(categoriaId);
 
             $.ajax({
                 url: '/gestion/app/controller/ArsenalController.php',
@@ -201,11 +219,10 @@
                 html = '<p>No hay productos seleccionados.</p>';
             }
             $('#ventaPreview').html(html);
-            $('#productosSeleccionados').val(JSON.stringify(productosSeleccionados));
-
             $('#totalVenta').html('<h4>Total: $' + total.toFixed(2) + '</h4>');
+            $('#productosSeleccionados').val(JSON.stringify(productosSeleccionados));
         }
-       
+
         function incrementarCantidad(index) {
             if (productosSeleccionados[index].cantidad < productosSeleccionados[index].stock) {
                 productosSeleccionados[index].cantidad++;
@@ -220,12 +237,11 @@
                 productosSeleccionados[index].cantidad--;
                 actualizarPrevisualizacion();
             } else {
-                if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                    productosSeleccionados.splice(index, 1);
-                    actualizarPrevisualizacion();
-                }
+                productosSeleccionados.splice(index, 1);
+                actualizarPrevisualizacion();
             }
         }
     </script>
 </body>
+
 </html>

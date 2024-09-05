@@ -3,7 +3,6 @@ require_once 'BaseModel.php';
 
 class Compras extends BaseModel {
 
-    // Obtiene todas las compras ordenadas por fecha
     public function getAllCompras() {
         $sql = "SELECT * FROM compras ORDER BY fecha_compra DESC";
         $stmt = $this->db->prepare($sql);
@@ -16,8 +15,6 @@ class Compras extends BaseModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    // Obtiene las compras por fecha específica
     public function getComprasByDate($date) {
         $sql = "SELECT * FROM compras WHERE fecha_compra = :date ORDER BY fecha_compra DESC";
         $stmt = $this->db->prepare($sql);
@@ -25,8 +22,6 @@ class Compras extends BaseModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    // Crea una nueva compra
     public function createCompra($descripcion, $cantidad, $costo_unitario, $total, $fecha, $proveedor = null, $metodo_pago = null, $observacion = null) {
         $sql = "INSERT INTO compras (descripcion_compra, cantidad, costo_unitario, total, fecha_compra, proveedor, metodo_pago, observacion)
                 VALUES (:descripcion, :cantidad, :costo_unitario, :total, :fecha, :proveedor, :metodo_pago, :observacion)";
@@ -41,8 +36,6 @@ class Compras extends BaseModel {
         $stmt->bindParam(':observacion', $observacion);
         $stmt->execute();
     }
-
-    // Obtiene una compra por su ID
     public function getCompraById($id) {
         $sql = "SELECT * FROM compras WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -51,13 +44,12 @@ class Compras extends BaseModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     public function registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, $fecha, $observacion, $proveedor, $metodo_pago) {
-        // Consulta para obtener el nombre del consumible por su ID
         $query = "SELECT nombre FROM consumibles WHERE id = :consumible_id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':consumible_id', $consumible_id, PDO::PARAM_INT);
         $stmt->execute();
         $consumible = $stmt->fetch(PDO::FETCH_ASSOC);
-        $nombre_consumible = $consumible['nombre'] ?? 'Compra de consumible'; // En caso de error, se mantiene la descripción genérica
+        $nombre_consumible = $consumible['nombre'] ?? 'Compra de consumible';
     
         $sql = "INSERT INTO compras (descripcion_compra, cantidad, costo_unitario, total, fecha_compra, proveedor, metodo_pago, observacion)
                 VALUES (:descripcion, :cantidad, :costo_unitario, :total, :fecha, :proveedor, :metodo_pago, :observacion)";
@@ -73,8 +65,6 @@ class Compras extends BaseModel {
         $stmt->bindParam(':observacion', $observacion);
         return $stmt->execute();
     }
-    
-    
     public function registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $fecha, $proveedor, $metodo_pago, $observacion) {
         try {
             $sql = "INSERT INTO compras_normales (descripcion, cantidad, costo_unitario, fecha, proveedor, metodo_pago, observacion)
@@ -94,7 +84,6 @@ class Compras extends BaseModel {
             return false;
         }
     }
-    // Obtiene el total por método de pago para una fecha específica
     public function getTotalPorMetodoPago($date) {
         $sql = "SELECT metodo_pago, SUM(total) as total_por_metodo
                 FROM compras
@@ -105,8 +94,6 @@ class Compras extends BaseModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    // Obtiene los consumibles por categoría
     public function getConsumiblesPorCategoria($categoriaId) {
         $query = "SELECT *
                   FROM consumibles c 
@@ -123,8 +110,5 @@ class Compras extends BaseModel {
         $stmt->bindParam(':consumible_id', $consumible_id, PDO::PARAM_INT);
         return $stmt->execute();
     }
-    
-
-    
 }
 ?>

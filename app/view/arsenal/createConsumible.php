@@ -21,6 +21,19 @@
                     <input type="text" id="marca" name="marca" class="form-control">
                 </div>
                 <div class="form-group col-md-4">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categorias[]" class="form-control" required>   
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                        <?php foreach ($categorias as $categoria): ?>
+                            <option value="<?php echo htmlspecialchars($categoria['id']); ?>">
+                                <?php echo htmlspecialchars($categoria['nombre']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                </div>
+                <div class="form-row">
+                <div class="form-group col-md-2">
                     <label for="unidad_medida">Unidad de Medida:</label>
                     <select id="unidad_medida" name="unidad_medida" class="form-control" required>
                         <option value="u">Unidad (u)</option>
@@ -30,28 +43,28 @@
                         <option value="ml">Mililitro (ml)</option>
                     </select>
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
+            
+            
+                <div class="form-group col-md-2">
                     <label for="stock">Stock:</label>
                     <input type="number" id="stock" name="stock" class="form-control" required>
                 </div>
-                <div class="form-group col-md-4">
-                    <label for="coste">Coste:</label>
+                <div class="form-group col-md-3">
+                    <label for="coste">Costo Total del producto:</label>
                     <input type="text" id="coste" name="coste" class="form-control" value="S/. 0.00">
                 </div>
-                <div class="form-group col-md-4">
-                    <label for="precio">Precio:</label>
+                <div class="form-group col-md-2">
+                    <label for="precio">Precio Unitario:</label>
                     <input type="text" id="precio" name="precio" class="form-control" value="S/. 0.00" required>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="descripcion_consumible">Descripción:</label>
+                    <label for="descripcion_consumible">Descripción del producto:</label>
                     <textarea id="descripcion_consumible" name="descripcion_consumible" class="form-control" required></textarea>
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="observacion">Observación:</label>
+                    <label for="observacion">Observación del producto:</label>
                     <textarea id="observacion" name="observacion" class="form-control"></textarea>
                 </div>
             </div>
@@ -64,33 +77,14 @@
                     <label for="fecha_compra">Fecha de Compra:</label>
                     <input type="date" id="fecha_compra" name="fecha_compra" class="form-control">
                 </div>
-                <div class="form-group col-md-4">
-                    <label for="categoria">Categoría:</label>
-                    <select id="categoria" name="categorias[]" class="form-control" required>   
-                        <option value="" disabled selected>Selecciona una categoría</option>
-                        <?php foreach ($categorias as $categoria): ?>
-                            <option value="<?php echo htmlspecialchars($categoria['id']); ?>">
-                                <?php echo htmlspecialchars($categoria['nombre']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+               
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="nuevaCategoria">Nueva Categoría:</label>
-                    <input type="text" id="nuevaCategoria" name="nuevaCategoria" class="form-control">
-                    <button type="button" id="addCategoriaBtn" class="btn btn-secondary mt-2">Agregar</button>
-                </div>
-            </div>
+
             <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
     </div>
 
     <script>
-
-
-        // Script para limpiar el campo de coste y precio al hacer clic
         document.getElementById('coste').addEventListener('focus', function () {
             if (this.value === 'S/. 0.00') {
                 this.value = '';
@@ -102,7 +96,6 @@
             }
         });
 
-        // Restaurar formato si el campo queda vacío
         document.getElementById('coste').addEventListener('blur', function () {
             if (this.value === '') {
                 this.value = 'S/. 0.00';
@@ -114,7 +107,6 @@
             }
         });
 
-        // Script para agregar nueva categoría
         document.getElementById('addCategoriaBtn').addEventListener('click', function () {
             const nuevaCategoria = document.getElementById('nuevaCategoria').value;
             

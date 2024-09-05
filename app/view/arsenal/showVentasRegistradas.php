@@ -1,16 +1,24 @@
 <?php
 $totalGanancia = 0;
+$totalesPorMetodo = [
+    'Efectivo' => 0,
+    'Visa' => 0,
+    'Yape' => 0,
+    'Plin' => 0,
+];
 
 if (!empty($ventas)) {
     foreach ($ventas as $venta) {
         $totalGanancia += $venta['total'];
+        $metodo_pago = $venta['metodo_pago'];
+        if (isset($totalesPorMetodo[$metodo_pago])) {
+            $totalesPorMetodo[$metodo_pago] += $venta['total'];
+        }
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +28,6 @@ if (!empty($ventas)) {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
 </head>
-
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Ventas Registradas</h1>
@@ -45,7 +52,7 @@ if (!empty($ventas)) {
                         <?php foreach ($ventas as $venta): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($venta['nombre']); ?></td>
-                                <td><?php echo htmlspecialchars($venta['cantidad']); ?></td>
+                                <td><?php echo htmlspecialchars($venta['cantidad_total']); ?></td>
                                 <td><?php echo htmlspecialchars($venta['total']); ?></td>
                                 <td><?php echo htmlspecialchars($venta['fecha']); ?></td>
                             </tr>
@@ -59,10 +66,24 @@ if (!empty($ventas)) {
             </table>
         </div>
 
-
-        <div class="alert alert-info mt-4">
-
-            <strong>Total del Día: </strong><?php echo number_format($totalGanancia, 2); ?> Soles
+        <div class="row mt-4">
+            <div class="col-md-5 d-flex align-items-center">
+                <div class="alert alert-info w-100">
+                    <strong>Total del Día: </strong><?php echo number_format($totalGanancia, 2); ?> Soles
+                </div>
+            </div>
+            <div class="col-md-7 d-flex align-items-center">
+                <div class="w-100">
+                    <?php foreach ($totalesPorMetodo as $metodo => $total): ?>
+                        <?php if ($total > 0): ?>
+                            <div class="alert alert-<?php echo $metodo == 'Efectivo' ? 'primary' : ($metodo == 'Visa' ? 'success' : ($metodo == 'Yape' ? 'warning' : 'info')); ?> mt-2">
+                                <strong><?php echo htmlspecialchars($metodo); ?>:</strong>
+                                <?php echo number_format($total, 2); ?> Soles
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -102,7 +123,29 @@ if (!empty($ventas)) {
                         text: 'Imprimir',
                         title: 'Ventas Registradas',
                         customize: function(win) {
-                            $(win.document.body).append('<div class="alert alert-info"><strong>Ganancia Total del Día: </strong><?php echo number_format($totalGanancia, 2); ?> USD</div>');
+                            var totalGanancia = <?php echo json_encode(number_format($totalGanancia, 2)); ?>;
+                            var resumenMetodos = <?php echo json_encode(array_filter($totalesPorMetodo, function($total) { return $total > 0; })); ?>;
+
+                            $(win.document.body).append(
+                                '<div class="alert alert-info mt-4">' +
+                                    '<strong>Total del Día: </strong>' + totalGanancia + ' Soles' +
+                                '</div>' +
+                                '<h2 class="mt-4">Resumen por Método de Pago</h2>' +
+                                '<div class="mt-4">' +
+                                    Object.keys(resumenMetodos).map(function(metodo) {
+                                        var total = resumenMetodos[metodo];
+                                        var alertClass = metodo === 'Efectivo' ? 'primary' : 
+                                                         metodo === 'Visa' ? 'success' : 
+                                                         metodo === 'Yape' ? 'warning' :
+                                                         metodo === 'Plin' ? 'danger' :  
+                                                         'info';    
+                                        return '<div class="alert alert-' + alertClass + ' mt-2">' +
+                                                '<strong>' + metodo + ':</strong> ' +
+                                                total.toFixed(2) + ' Soles' +
+                                               '</div>';
+                                    }).join('')
+                                + '</div>'
+                            );
                         }
                     }
                 ]
@@ -110,5 +153,4 @@ if (!empty($ventas)) {
         });
     </script>
 </body>
-
 </html>
