@@ -82,7 +82,6 @@
                 </div>
                 <div id="totalVenta" class="mt-3"></div>
 
-                <!-- Formulario para registrar la venta -->
                 <form id="ventaForm" action="/gestion/app/controller/ArsenalController.php?action=createVentaConsumible" method="post" class="mt-4">
                     <input type="hidden" id="productosSeleccionados" name="productosSeleccionados">
 
@@ -104,7 +103,6 @@
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
 
-    <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

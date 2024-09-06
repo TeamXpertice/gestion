@@ -60,11 +60,18 @@ class ArsenalController extends BaseController
     {
         $nombre = $this->checkLogin();
         $consumibles = $this->model->getAllConsumibles();
-
+        $categorias = $this->model->getAllCategorias();
         $this->loadView('arsenal.ventaConsumible', [
             'consumibles' => $consumibles,
+            'categorias' => $categorias,
             'nombre' => $nombre
         ]);
+    }
+    public function getConsumiblesByCategoria() {
+        $categoriaId = $_GET['id'];
+        $consumibles = $this->model->getConsumiblesByCategoria($categoriaId);
+        
+        echo json_encode(['consumibles' => $consumibles]);
     }
     
     public function showVentasRegistradas()
@@ -85,6 +92,7 @@ class ArsenalController extends BaseController
     public function createConsumible()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Recoger los datos del formulario
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
             $marca = $_POST['marca'];
@@ -95,7 +103,8 @@ class ArsenalController extends BaseController
             $stock = $_POST['stock'];
             $coste = $_POST['coste'];
             $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : [];
-
+    
+            // Crear el consumible principal
             $consumibleId = $this->model->createConsumible(
                 $nombre,
                 $descripcion_consumible,
@@ -107,9 +116,25 @@ class ArsenalController extends BaseController
                 $stock,
                 $coste
             );
-
+    
             if ($consumibleId) {
+                // Asignar categorías al consumible
                 $this->model->assignCategoriasToConsumible($consumibleId, $categorias);
+    
+                // Procesar los componentes (consumibles hijos)
+                if (isset($_POST['componentes']) && isset($_POST['cantidad_componente'])) {
+                    foreach ($_POST['componentes'] as $componenteId) {
+                        $cantidad = $_POST['cantidad_componente'][$componenteId];
+    
+                        // Insertar en la tabla consumible_componentes
+                        $this->model->addComponenteToConsumible($consumibleId, $componenteId, $cantidad);
+    
+                        // Descontar stock del componente
+                        $this->model->descontarStockConsumible($componenteId, $cantidad);
+                    }
+                }
+    
+                // Redirigir a la vista de consumibles
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
                 exit;
             } else {
@@ -117,9 +142,15 @@ class ArsenalController extends BaseController
             }
         } else {
             $categorias = $this->model->getAllCategorias();
-            $this->loadView('arsenal.createConsumible', ['categorias' => $categorias]);
+            $consumibles = $this->model->getAllConsumibles();  // Obtener todos los consumibles para seleccionarlos como componentes
+            $this->loadView('arsenal.createConsumible', [
+                'categorias' => $categorias,
+                'consumibles' => $consumibles  // Pasar los consumibles a la vista
+            ]);
         }
     }
+    
+
 
     public function editConsumible()
     {

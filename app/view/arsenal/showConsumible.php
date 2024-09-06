@@ -63,43 +63,43 @@
                             <input type="text" id="nuevaCategoria" name="nuevaCategoria" class="form-control">
                         </div>
                     </div>
-                    
+
                     <button type="button" id="addCategoriaBtn" class="btn btn-primary">Agregar</button>
                     <hr>
 
                     <!-- Tabla para mostrar categorías existentes -->
 
-<h5>Categorías Existentes</h5>
-<table class="table table-bordered table-categorias"> <!-- Aquí agregamos la clase table-categorias -->
-    <thead>
-        <tr>
-            <th>Todas las categorias</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (!empty($categorias)): ?>
-            <?php
-            $total = count($categorias);
-            for ($i = 0; $i < $total; $i += 2):
-            ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($categorias[$i]['nombre']); ?></td>
+                    <h5>Categorías Existentes</h5>
+                    <table class="table table-bordered table-categorias"> <!-- Aquí agregamos la clase table-categorias -->
+                        <thead>
+                            <tr>
+                                <th>Todas las categorias</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($categorias)): ?>
+                                <?php
+                                $total = count($categorias);
+                                for ($i = 0; $i < $total; $i += 2):
+                                ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($categorias[$i]['nombre']); ?></td>
 
-                    <td>
-                        <?php if (isset($categorias[$i + 1])): ?>
-                            <?php echo htmlspecialchars($categorias[$i + 1]['nombre']); ?>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endfor; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="2">No hay categorías disponibles.</td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+                                        <td>
+                                            <?php if (isset($categorias[$i + 1])): ?>
+                                                <?php echo htmlspecialchars($categorias[$i + 1]['nombre']); ?>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endfor; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="2">No hay categorías disponibles.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
 
 
                 </div>
@@ -126,91 +126,89 @@
 
     <script>
         $(document).ready(function() {
-    // Aplicar DataTables solo a la tabla de consumibles
-    $('.table:not(.table-categorias)').DataTable({
-        language: {
-            url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
-        },
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'excel',
-                text: 'Excel',
-                title: 'Bienes_Registrados'
-            },
-            {
-                extend: 'pdf',
-                text: 'PDF',
-                title: 'Bienes_Registrados',
-                exportOptions: {
-                    columns: ':not(:last-child)' 
-                }
-            },
-            {
-                extend: 'print',
-                text: 'Imprimir',
-                title: 'Bienes Registrados',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                }
-            }
-        ]
-    });
-
-    // Sin DataTables para la tabla de categorías
-    $('#addCategoriaBtn').on('click', function() {
-        const nuevaCategoria = $('#nuevaCategoria').val();
-
-        if (nuevaCategoria) {
-            fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+            // Aplicar DataTables solo a la tabla de consumibles
+            $('.table:not(.table-categorias)').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
                 },
-                body: `nombre=${encodeURIComponent(nuevaCategoria)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    $('#categoriaModal').modal('hide');
-                    $('body').removeClass('modal-open');
-                    $('.modal-backdrop').remove();
+                dom: 'Bfrtip',
+                buttons: [{
+                        extend: 'excel',
+                        text: 'Excel',
+                        title: 'Bienes_Registrados'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        title: 'Bienes_Registrados',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        title: 'Bienes Registrados',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    }
+                ]
+            });
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Categoría agregada!',
-                        text: 'La categoría se ha agregado exitosamente.',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+            // Sin DataTables para la tabla de categorías
+            $('#addCategoriaBtn').on('click', function() {
+                const nuevaCategoria = $('#nuevaCategoria').val();
 
-                    $('#nuevaCategoria').val('');
+                if (nuevaCategoria) {
+                    fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `nombre=${encodeURIComponent(nuevaCategoria)}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                $('#categoriaModal').modal('hide');
+                                $('body').removeClass('modal-open');
+                                $('.modal-backdrop').remove();
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Categoría agregada!',
+                                    text: 'La categoría se ha agregado exitosamente.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                $('#nuevaCategoria').val('');
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Hubo un problema al agregar la categoría.'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Hubo un problema con la solicitud.'
+                            });
+                        });
                 } else {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un problema al agregar la categoría.'
+                        icon: 'warning',
+                        title: 'Campo vacío',
+                        text: 'Por favor, ingresa el nombre de la categoría.'
                     });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un problema con la solicitud.'
-                });
             });
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Campo vacío',
-                text: 'Por favor, ingresa el nombre de la categoría.'
-            });
-        }
-    });
-});
-      
+        });
     </script>
 </body>
 

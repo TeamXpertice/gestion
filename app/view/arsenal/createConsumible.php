@@ -79,44 +79,45 @@
                 </div>
                
             </div>
+<!-- Botón para abrir el modal -->
+<button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal">Seleccionar Consumibles</button>
 
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <div class="form-group">
-    <label for="componentes">Componentes del Consumible:</label>
-    <select id="componentes" name="componentes[]" class="form-control" multiple>
-        <?php foreach ($consumibles as $consumible): ?>
-            <option value="<?php echo htmlspecialchars($consumible['id']); ?>">
-                <?php echo htmlspecialchars($consumible['nombre']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+<!-- Modal -->
+<div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoriaModalLabel">Selecciona una Categoría</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenedor para las categorías -->
+                <h6>Categorías</h6>
+                <div id="categoriasContainer" class="mb-3">
+                    <?php foreach ($categorias as $categoria): ?>
+                        <button class="btn btn-secondary categoria-btn" data-id="<?php echo $categoria['id']; ?>">
+                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Contenedor para mostrar los consumibles seleccionados -->
+                <h6>Consumibles</h6>
+                <div id="consumiblesContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardarSeleccion">Guardar Selección</button>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div id="componentes-container"></div>
-
-<button type="button" id="addComponenteBtn" class="btn btn-secondary">Agregar Componente</button>
-
+                        
+            <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
     </div>
-    <script>
-    document.getElementById('addComponenteBtn').addEventListener('click', function() {
-        const select = document.getElementById('componentes');
-        const selectedOptions = Array.from(select.selectedOptions);
-
-        selectedOptions.forEach(option => {
-            const componenteId = option.value;
-            const componenteNombre = option.text;
-
-            const row = document.createElement('div');
-            row.classList.add('form-group', 'componente-row');
-            row.innerHTML = `
-                <label>${componenteNombre} - Cantidad</label>
-                <input type="number" name="cantidad_componente[${componenteId}]" class="form-control" min="1" required>
-            `;
-            document.getElementById('componentes-container').appendChild(row);
-        });
-    });
-</script>
 
     <script>
         document.getElementById('coste').addEventListener('focus', function () {

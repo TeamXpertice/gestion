@@ -197,6 +197,14 @@ class Arsenal extends BaseModel
             ':id' => $id
         ]);
     }
+    public function getConsumiblesByCategoria($categoriaId) {
+        $sql = "SELECT * FROM consumibles WHERE categoria_id = :categoriaId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':categoriaId', $categoriaId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     public function getConsumibleById($id)
     {
         try {
@@ -233,6 +241,39 @@ class Arsenal extends BaseModel
             return false;
         }
     }
+// Insertar componente en la tabla intermedia consumible_componentes
+public function addComponenteToConsumible($consumibleId, $componenteId, $cantidad)
+{
+    try {
+        $sql = "INSERT INTO consumible_componentes (consumible_id, componente_id, cantidad) 
+                VALUES (:consumible_id, :componente_id, :cantidad)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':consumible_id' => $consumibleId,
+            ':componente_id' => $componenteId,
+            ':cantidad' => $cantidad
+        ]);
+    } catch (PDOException $e) {
+        error_log("Error adding componente to consumible: " . $e->getMessage());
+    }
+}
+
+
+// Descontar stock del consumible componente
+public function descontarStockConsumible($componenteId, $cantidad)
+{
+    try {
+        $sql = "UPDATE consumibles SET stock = stock - :cantidad WHERE id = :componente_id AND stock >= :cantidad";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':cantidad' => $cantidad,
+            ':componente_id' => $componenteId
+        ]);
+    } catch (PDOException $e) {
+        error_log("Error descontando stock del consumible: " . $e->getMessage());
+    }
+}
+
 
     public function createBien($descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $estado, $dimensiones, $color, $tipo_material, $estado_fisico_actual, $cantidad, $coste, $observacion)
     {
