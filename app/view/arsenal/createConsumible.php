@@ -45,8 +45,6 @@
                         <option value="ml">Mililitro (ml)</option>
                     </select>
                 </div>
-
-
                 <div class="form-group col-md-2">
                     <label for="stock">Stock:</label>
                     <input type="number" id="stock" name="stock" class="form-control" required>
@@ -79,11 +77,8 @@
                     <label for="fecha_compra">Fecha de Compra:</label>
                     <input type="date" id="fecha_compra" name="fecha_compra" class="form-control">
                 </div>
-
             </div>
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal">Seleccionar Consumibles</button>
-
-            <!-- Modal -->
             <div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
@@ -94,7 +89,6 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <!-- Contenedor para las categorías -->
                             <h6>Categorías</h6>
                             <div id="categoriasContainer" class="mb-3">
                                 <?php foreach ($categorias as $categoria): ?>
@@ -103,8 +97,6 @@
                                     </button>
                                 <?php endforeach; ?>
                             </div>
-
-                            <!-- Contenedor para mostrar los consumibles seleccionados -->
                             <h6>Consumibles</h6>
                             <div id="consumiblesContainer"></div>
                         </div>
@@ -115,11 +107,9 @@
                     </div>
                 </div>
             </div>
-
             <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
     </div>
-
     <script>
         document.getElementById('coste').addEventListener('focus', function() {
             if (this.value === 'S/. 0.00') {
@@ -142,7 +132,6 @@
                 this.value = 'S/. 0.00';
             }
         });
-
         document.getElementById('addCategoriaBtn').addEventListener('click', function() {
             const nuevaCategoria = document.getElementById('nuevaCategoria').value;
 
@@ -174,5 +163,4 @@
         });
     </script>
 </body>
-
 </html>
