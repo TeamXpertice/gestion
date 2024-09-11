@@ -88,10 +88,10 @@ error_reporting(E_ALL);
                 </div>
             </div>
 
-            <!-- Botón para abrir el modal de selección de consumibles -->
+
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal" id="btnSeleccionarConsumibles" disabled>Seleccionar Consumibles</button>
 
-            <!-- Modal de selección de categorías y consumibles -->
+
             <div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
@@ -114,17 +114,14 @@ error_reporting(E_ALL);
                             <div id="consumiblesContainer"></div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                            <button type="button" class="btn btn-primary" id="guardarSeleccion">Guardar Selección</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar Selección</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Lista de consumibles seleccionados -->
             <div id="listaConsumiblesSeleccionados"></div>
 
-            <!-- Sección para mostrar la ganancia -->
             <div class="mt-4">
                 <h3>Ganancia</h3>
                 <div id="gananciaContainer" class="alert alert-info">
@@ -268,8 +265,108 @@ error_reporting(E_ALL);
                 document.getElementById('marca').value = esMultiple ? 'Compuesto' : '';
                 document.getElementById('coste').disabled = esMultiple;
                 document.getElementById('stock').disabled = esMultiple;
-                document.querySelector('button[data-target="#categoriaModal"]').disabled = !esMultiple;
+
+                if (esMultiple) {
+                    document.getElementById('coste').value = 'S/. 0.00';
+                    document.getElementById('stock').value = '';
+                    document.getElementById('precio').value = 'S/. 0.00';
+                }
+
+                const btnSeleccionar = document.querySelector('button[data-target="#categoriaModal"]');
+                btnSeleccionar.disabled = !esMultiple;
+
+                // Mostrar u ocultar el elemento de ganancia compuesto
+                document.getElementById('gananciaCompuesto').classList.toggle('d-none', !esMultiple);
+                document.getElementById('gananciaProducto').classList.toggle('d-none', esMultiple);
             });
+
+            // Habilitar el botónde guardar selección del modal 
+            document.getElementById('guardarSeleccion').addEventListener('click', function() {
+                let selectedConsumibles = [];
+                document.querySelectorAll('#consumiblesContainer input[type="checkbox"]').forEach(function(checkbox) {
+                    selectedConsumibles.push(checkbox.value);
+                });
+                if (selectedConsumibles.length > 0) {
+                    let lista = document.getElementById('listaConsumiblesSeleccionados');
+                    lista.innerHTML = 'Consumibles Seleccionados: <ul>';
+                    selectedConsumibles.forEach(function(id) {
+                        lista.innerHTML += '<li>Consumible ID: ' + id + '</li>';
+                    });
+                    lista.innerHTML += '</ul>';
+                } else {
+                    document.getElementById('listaConsumiblesSeleccionados').innerHTML = 'No se han seleccionado consumibles.';
+                }
+
+                $('#categoriaModal').modal('hide');
+            });
+
+            // Manejo de selección de categorías en el modal
+            document.getElementById('categoriasContainer').addEventListener('click', function(event) {
+                if (event.target.classList.contains('categoria-btn')) {
+                    let categoriaId = event.target.getAttribute('data-id');
+                    // Aquí debes hacer una solicitud AJAX para obtener los consumibles de la categoría seleccionada
+                    fetch('/gestion/app/controller/ArsenalController.php?action=getConsumiblesByCategoria&categoria_id=' + categoriaId)
+                        .then(response => response.json())
+                        .then(data => {
+                            let consumiblesContainer = document.getElementById('consumiblesContainer');
+                            consumiblesContainer.innerHTML = '';
+                            data.consumibles.forEach(consumible => {
+                                let checkbox = document.createElement('input');
+                                checkbox.type = 'checkbox';
+                                checkbox.value = consumible.id;
+                                checkbox.id = 'consumible_' + consumible.id;
+                                let label = document.createElement('label');
+                                label.htmlFor = checkbox.id;
+                                label.innerText = consumible.nombre;
+                                consumiblesContainer.appendChild(checkbox);
+                                consumiblesContainer.appendChild(label);
+                                consumiblesContainer.appendChild(document.createElement('br'));
+                            });
+                        });
+                }
+            });
+
+            // Función para calcular la ganancia
+            function calcularGanancia() {
+                const costoTotal = parseFloat(document.getElementById('coste').value.replace('S/. ', '')) || 0;
+                const precioUnitario = parseFloat(document.getElementById('precio').value.replace('S/. ', '')) || 0;
+                const stock = parseFloat(document.getElementById('stock').value) || 0;
+
+                if (precioUnitario > 0) {
+                    // Calcular ganancia del producto
+                    const gananciaProducto = (precioUnitario * stock) - costoTotal;
+                    const porcentajeGanancia = (gananciaProducto / costoTotal * 100).toFixed(2);
+
+                    document.getElementById('gananciaProducto').textContent = `Ganancia del Producto: S/. ${gananciaProducto.toFixed(2)} (${porcentajeGanancia}%)`;
+                } else {
+                    document.getElementById('gananciaProducto').textContent = `Ganancia del Producto: S/. 0.00 (0%)`;
+                }
+
+                // Calcular la ganancia para los consumibles compuestos
+                const componentes = document.querySelectorAll('input[name^="componentes["]');
+                let costoCompuesto = 0;
+                componentes.forEach(input => {
+                    const cantidad = parseFloat(input.value);
+                    const precioUnitario = 10; // Ajusta según sea necesario
+                    costoCompuesto += cantidad * precioUnitario;
+                });
+
+                if (precioUnitario > 0) {
+                    const gananciaCompuesto = precioUnitario - (costoCompuesto / stock);
+                    const porcentajeGananciaCompuesto = ((gananciaCompuesto / (costoCompuesto / stock)) * 100).toFixed(2);
+
+                    document.getElementById('gananciaCompuesto').textContent = `Ganancia del Compuesto: S/. ${gananciaCompuesto.toFixed(2)} (${porcentajeGananciaCompuesto}%)`;
+                } else {
+                    document.getElementById('gananciaCompuesto').textContent = `Ganancia del Compuesto: S/. 0.00 (0%)`;
+                }
+            }
+
+
+            // Llama a calcularGanancia cuando cambien los campos relacionados
+            document.getElementById('coste').addEventListener('input', calcularGanancia);
+            document.getElementById('precio').addEventListener('input', calcularGanancia);
+            document.getElementById('stock').addEventListener('input', calcularGanancia);
+
 
             // Limpiar y restaurar campos de coste y precio
             document.getElementById('coste').addEventListener('focus', function() {
