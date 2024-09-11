@@ -1,3 +1,9 @@
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -78,89 +84,136 @@
                     <input type="date" id="fecha_compra" name="fecha_compra" class="form-control">
                 </div>
             </div>
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal">Seleccionar Consumibles</button>
-            <div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="categoriaModalLabel">Selecciona una Categoría</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <h6>Categorías</h6>
-                            <div id="categoriasContainer" class="mb-3">
-                                <?php foreach ($categorias as $categoria): ?>
-                                    <button class="btn btn-secondary categoria-btn" data-id="<?php echo $categoria['id']; ?>">
-                                        <?php echo htmlspecialchars($categoria['nombre']); ?>
-                                    </button>
-                                <?php endforeach; ?>
-                            </div>
-                            <h6>Consumibles</h6>
-                            <div id="consumiblesContainer"></div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                            <button type="button" class="btn btn-primary" id="guardarSeleccion">Guardar Selección</button>
-                        </div>
-                    </div>
-                </div>
+
+    <!-- Botón para abrir el modal de selección de consumibles -->
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal">Seleccionar Consumibles</button>
+
+<!-- Modal de selección de categorías y consumibles -->
+<div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoriaModalLabel">Selecciona una Categoría</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
+            <div class="modal-body">
+                <h6>Categorías</h6>
+                <div id="categoriasContainer" class="mb-3">
+                    <?php foreach ($categorias as $categoria): ?>
+                        <button type="button" class="btn btn-secondary categoria-btn" data-id="<?php echo $categoria['id']; ?>">
+                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+                <h6>Consumibles</h6>
+                <div id="consumiblesContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardarSeleccion">Guardar Selección</button>
+            </div>
+        </div>
     </div>
-    <script>
-        document.getElementById('coste').addEventListener('focus', function() {
-            if (this.value === 'S/. 0.00') {
-                this.value = '';
-            }
-        });
-        document.getElementById('precio').addEventListener('focus', function() {
-            if (this.value === 'S/. 0.00') {
-                this.value = '';
-            }
-        });
+</div>
 
-        document.getElementById('coste').addEventListener('blur', function() {
-            if (this.value === '') {
-                this.value = 'S/. 0.00';
-            }
-        });
-        document.getElementById('precio').addEventListener('blur', function() {
-            if (this.value === '') {
-                this.value = 'S/. 0.00';
-            }
-        });
-        document.getElementById('addCategoriaBtn').addEventListener('click', function() {
-            const nuevaCategoria = document.getElementById('nuevaCategoria').value;
+<!-- Lista de consumibles seleccionados -->
+<div id="listaConsumiblesSeleccionados"></div>
 
-            if (nuevaCategoria) {
-                fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `nombre=${encodeURIComponent(nuevaCategoria)}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const select = document.getElementById('categoria');
-                            const option = document.createElement('option');
-                            option.value = data.id;
-                            option.text = data.nombre;
-                            select.add(option);
-                            select.value = data.id;
-                        } else {
-                            alert('Error al agregar la categoría.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
+<button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+// Manejar la selección de categorías y mostrar consumibles
+document.querySelectorAll('.categoria-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const categoriaId = this.getAttribute('data-id');
+        
+        // Hacer una solicitud para obtener los consumibles de la categoría seleccionada
+        fetch(`/gestion/app/controller/ArsenalController.php?action=getConsumiblesByCategoria&id=${categoriaId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.consumibles.length > 0) {
+                    let consumiblesHtml = '';
+                    data.consumibles.forEach(consumible => {
+                        consumiblesHtml += `
+                            <div class="consumible-item">
+                                <span>${consumible.nombre} - Stock: ${consumible.stock}</span>
+                                <input type="number" min="1" max="${consumible.stock}" value="1" id="cantidad_${consumible.id}">
+                                <button type="button" class="btn btn-success agregar-consumible" data-id="${consumible.id}" data-nombre="${consumible.nombre}">
+                                    Agregar
+                                </button>
+                            </div>
+                        `;
                     });
-            }
-        });
-    </script>
+                    document.getElementById('consumiblesContainer').innerHTML = consumiblesHtml;
+                } else {
+                    document.getElementById('consumiblesContainer').innerHTML = '<p>No hay consumibles disponibles en esta categoría.</p>';
+                }
+            })
+            .catch(error => console.error('Error al obtener los consumibles:', error));
+    });
+});
+
+// Agregar consumible seleccionado
+document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('agregar-consumible')) {
+        const consumibleId = event.target.getAttribute('data-id');
+        const consumibleNombre = event.target.getAttribute('data-nombre');
+        const cantidadSeleccionada = document.getElementById(`cantidad_${consumibleId}`).value;
+
+        if (!document.getElementById(`consumible_${consumibleId}`)) {
+            const itemHtml = `
+                <div id="consumible_${consumibleId}">
+                    <span>${consumibleNombre} - Cantidad: ${cantidadSeleccionada}</span>
+                    <input type="hidden" name="componentes[${consumibleId}][cantidad]" value="${cantidadSeleccionada}">
+                    <input type="hidden" name="componentes[${consumibleId}][id]" value="${consumibleId}">
+                    <button type="button" class="btn btn-danger remover-consumible" data-id="${consumibleId}">Eliminar</button>
+                </div>
+            `;
+            document.getElementById('listaConsumiblesSeleccionados').insertAdjacentHTML('beforeend', itemHtml);
+        } else {
+            alert('Este consumible ya ha sido seleccionado.');
+        }
+    }
+});
+
+// Remover consumible de la lista
+document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('remover-consumible')) {
+        const consumibleId = event.target.getAttribute('data-id');
+        document.getElementById(`consumible_${consumibleId}`).remove();
+    }
+});
+});
+</script>
+
+<script>
+// Limpiar el campo de coste y precio al enfocarse, restaurar valor si queda vacío
+document.getElementById('coste').addEventListener('focus', function() {
+if (this.value === 'S/. 0.00') {
+    this.value = '';
+}
+});
+document.getElementById('precio').addEventListener('focus', function() {
+if (this.value === 'S/. 0.00') {
+    this.value = '';
+}
+});
+document.getElementById('coste').addEventListener('blur', function() {
+if (this.value === '') {
+    this.value = 'S/. 0.00';
+}
+});
+document.getElementById('precio').addEventListener('blur', function() {
+if (this.value === '') {
+    this.value = 'S/. 0.00';
+}
+});
+</script>
 </body>
+
 </html>
