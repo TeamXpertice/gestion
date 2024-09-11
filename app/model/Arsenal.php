@@ -197,13 +197,23 @@ class Arsenal extends BaseModel
             ':id' => $id
         ]);
     }
-    public function getConsumiblesByCategoria($categoriaId) {
-        $sql = "SELECT * FROM consumibles WHERE categoria_id = :categoriaId";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':categoriaId', $categoriaId, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    // Modelo
+// Modelo
+// Modelo
+
+
+public function getConsumiblesByCategoria($categoriaId) {
+    $sql = "SELECT c.* 
+            FROM consumibles c 
+            INNER JOIN consumibles_categorias cc ON c.id = cc.consumible_id 
+            WHERE cc.categoria_id = :categoriaId";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindParam(':categoriaId', $categoriaId, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
     
     public function getConsumibleById($id)
     {
@@ -341,6 +351,7 @@ public function descontarStockConsumible($componenteId, $cantidad)
             ':observacion' => $observacion
         ]);
     }
+    
     public function getCategoriaByConsumible($consumibleId)
     {
         $query = "SELECT categoria_id FROM consumibles_categorias WHERE consumible_id = ?";

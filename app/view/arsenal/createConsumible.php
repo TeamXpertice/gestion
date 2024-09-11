@@ -2,7 +2,6 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -23,6 +22,10 @@ error_reporting(E_ALL);
                 <div class="form-group col-md-4">
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" class="form-control" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="consumible_multiple">Es un consumible compuesto:</label>
+                    <input type="checkbox" id="consumible_multiple" name="consumible_multiple">
                 </div>
                 <div class="form-group col-md-4">
                     <label for="marca">Marca:</label>
@@ -85,88 +88,109 @@ error_reporting(E_ALL);
                 </div>
             </div>
 
-    <!-- Botón para abrir el modal de selección de consumibles -->
-    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal">Seleccionar Consumibles</button>
+            <!-- Botón para abrir el modal de selección de consumibles -->
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#categoriaModal" id="btnSeleccionarConsumibles" disabled>Seleccionar Consumibles</button>
 
-<!-- Modal de selección de categorías y consumibles -->
-<div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="categoriaModalLabel">Selecciona una Categoría</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h6>Categorías</h6>
-                <div id="categoriasContainer" class="mb-3">
-                    <?php foreach ($categorias as $categoria): ?>
-                        <button type="button" class="btn btn-secondary categoria-btn" data-id="<?php echo $categoria['id']; ?>">
-                            <?php echo htmlspecialchars($categoria['nombre']); ?>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-                <h6>Consumibles</h6>
-                <div id="consumiblesContainer"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="guardarSeleccion">Guardar Selección</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Lista de consumibles seleccionados -->
-<div id="listaConsumiblesSeleccionados"></div>
-
-<button type="submit" class="btn btn-primary">Guardar</button>
-</form>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-// Manejar la selección de categorías y mostrar consumibles
-document.querySelectorAll('.categoria-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const categoriaId = this.getAttribute('data-id');
-        
-        // Hacer una solicitud para obtener los consumibles de la categoría seleccionada
-        fetch(`/gestion/app/controller/ArsenalController.php?action=getConsumiblesByCategoria&id=${categoriaId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.consumibles.length > 0) {
-                    let consumiblesHtml = '';
-                    data.consumibles.forEach(consumible => {
-                        consumiblesHtml += `
-                            <div class="consumible-item">
-                                <span>${consumible.nombre} - Stock: ${consumible.stock}</span>
-                                <input type="number" min="1" max="${consumible.stock}" value="1" id="cantidad_${consumible.id}">
-                                <button type="button" class="btn btn-success agregar-consumible" data-id="${consumible.id}" data-nombre="${consumible.nombre}">
-                                    Agregar
-                                </button>
+            <!-- Modal de selección de categorías y consumibles -->
+            <div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-labelledby="categoriaModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="categoriaModalLabel">Selecciona una Categoría</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Categorías</h6>
+                            <div id="categoriasContainer" class="mb-3">
+                                <?php foreach ($categorias as $categoria): ?>
+                                    <button type="button" class="btn btn-secondary categoria-btn" data-id="<?php echo $categoria['id']; ?>">
+                                        <?php echo htmlspecialchars($categoria['nombre']); ?>
+                                    </button>
+                                <?php endforeach; ?>
                             </div>
-                        `;
-                    });
-                    document.getElementById('consumiblesContainer').innerHTML = consumiblesHtml;
-                } else {
-                    document.getElementById('consumiblesContainer').innerHTML = '<p>No hay consumibles disponibles en esta categoría.</p>';
-                }
-            })
-            .catch(error => console.error('Error al obtener los consumibles:', error));
-    });
-});
+                            <h6>Consumibles</h6>
+                            <div id="consumiblesContainer"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" id="guardarSeleccion">Guardar Selección</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-// Agregar consumible seleccionado
-document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('agregar-consumible')) {
-        const consumibleId = event.target.getAttribute('data-id');
-        const consumibleNombre = event.target.getAttribute('data-nombre');
-        const cantidadSeleccionada = document.getElementById(`cantidad_${consumibleId}`).value;
+            <!-- Lista de consumibles seleccionados -->
+            <div id="listaConsumiblesSeleccionados"></div>
 
-        if (!document.getElementById(`consumible_${consumibleId}`)) {
-            const itemHtml = `
+            <!-- Sección para mostrar la ganancia -->
+            <div class="mt-4">
+                <h3>Ganancia</h3>
+                <div id="gananciaContainer" class="alert alert-info">
+                    <p id="gananciaProducto">Ganancia del Producto: S/. 0.00 (0%)</p>
+                    <p id="gananciaCompuesto" class="d-none">Ganancia del Compuesto: S/. 0.00 (0%)</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+
+    <!-- Incluye jQuery desde un CDN o archivo local -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejo del clic en el botón de categoría
+            document.querySelectorAll('.categoria-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoriaId = this.getAttribute('data-id');
+
+                    // Usar fetch para obtener los consumibles por categoría
+                    fetch(`/gestion/app/controller/ArsenalController.php?action=getConsumiblesByCategoria&id=${categoriaId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Red no responde');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.consumibles && data.consumibles.length > 0) {
+                                let consumiblesHtml = '';
+                                data.consumibles.forEach(consumible => {
+                                    consumiblesHtml += `
+                    <div class="consumible-item">
+                        <span>${consumible.nombre} - Stock: ${consumible.stock}</span>
+                        <input type="number" min="1" max="${consumible.stock}" value="1" id="cantidad_${consumible.id}">
+                        <button type="button" class="btn btn-success agregar-consumible" data-id="${consumible.id}" data-nombre="${consumible.nombre}" data-precio="${consumible.precio}">
+                            Agregar
+                        </button>
+                    </div>
+                `;
+                                });
+                                document.getElementById('consumiblesContainer').innerHTML = consumiblesHtml;
+                            } else {
+                                document.getElementById('consumiblesContainer').innerHTML = '<p>No hay consumibles disponibles en esta categoría.</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al obtener los consumibles:', error);
+                        });
+                });
+            });
+
+            // Agregar y remover consumibles de la lista
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('agregar-consumible')) {
+                    const consumibleId = event.target.getAttribute('data-id');
+                    const consumibleNombre = event.target.getAttribute('data-nombre');
+                    const cantidadSeleccionada = document.getElementById(`cantidad_${consumibleId}`).value;
+                    const precioUnitario = parseFloat(event.target.getAttribute('data-precio'));
+
+                    if (!document.getElementById(`consumible_${consumibleId}`)) {
+                        const itemHtml = `
                 <div id="consumible_${consumibleId}">
                     <span>${consumibleNombre} - Cantidad: ${cantidadSeleccionada}</span>
                     <input type="hidden" name="componentes[${consumibleId}][cantidad]" value="${cantidadSeleccionada}">
@@ -174,46 +198,102 @@ document.addEventListener('click', function (event) {
                     <button type="button" class="btn btn-danger remover-consumible" data-id="${consumibleId}">Eliminar</button>
                 </div>
             `;
-            document.getElementById('listaConsumiblesSeleccionados').insertAdjacentHTML('beforeend', itemHtml);
-        } else {
-            alert('Este consumible ya ha sido seleccionado.');
-        }
-    }
-});
+                        document.getElementById('listaConsumiblesSeleccionados').insertAdjacentHTML('beforeend', itemHtml);
+                        calcularCostoTotal(); // Actualiza el costo total
+                        calcularGanancia(); // Actualiza la ganancia
+                    } else {
+                        alert('Este consumible ya ha sido seleccionado.');
+                    }
+                }
 
-// Remover consumible de la lista
-document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('remover-consumible')) {
-        const consumibleId = event.target.getAttribute('data-id');
-        document.getElementById(`consumible_${consumibleId}`).remove();
-    }
-});
-});
-</script>
+                // Remover consumible de la lista
+                if (event.target.classList.contains('remover-consumible')) {
+                    const consumibleId = event.target.getAttribute('data-id');
+                    document.getElementById(`consumible_${consumibleId}`).remove();
+                    calcularCostoTotal(); // Actualiza el costo total después de eliminar un consumible
+                    calcularGanancia(); // Actualiza la ganancia
+                }
+            });
 
-<script>
-// Limpiar el campo de coste y precio al enfocarse, restaurar valor si queda vacío
-document.getElementById('coste').addEventListener('focus', function() {
-if (this.value === 'S/. 0.00') {
-    this.value = '';
-}
-});
-document.getElementById('precio').addEventListener('focus', function() {
-if (this.value === 'S/. 0.00') {
-    this.value = '';
-}
-});
-document.getElementById('coste').addEventListener('blur', function() {
-if (this.value === '') {
-    this.value = 'S/. 0.00';
-}
-});
-document.getElementById('precio').addEventListener('blur', function() {
-if (this.value === '') {
-    this.value = 'S/. 0.00';
-}
-});
-</script>
+            // Función para calcular el costo total
+            function calcularCostoTotal() {
+                let total = 0;
+                document.querySelectorAll('input[name^="componentes["]').forEach(input => {
+                    const cantidad = parseFloat(input.value);
+                    const precioUnitario = 10; // Ajusta según sea necesario
+                    total += cantidad * precioUnitario;
+                });
+                document.getElementById('coste').value = 'S/. ' + total.toFixed(2);
+                calcularGanancia(); // Actualiza la ganancia después de calcular el costo total
+            }
+
+            // Función para calcular la ganancia
+            function calcularGanancia() {
+                const costoTotal = parseFloat(document.getElementById('coste').value.replace('S/. ', '')) || 0;
+                const precioUnitario = parseFloat(document.getElementById('precio').value.replace('S/. ', '')) || 0;
+                const stock = parseFloat(document.getElementById('stock').value) || 0;
+
+                if (precioUnitario > 0) {
+                    const gananciaPorUnidad = precioUnitario - (costoTotal / stock);
+                    const porcentajeGanancia = ((gananciaPorUnidad / (costoTotal / stock)) * 100).toFixed(2);
+
+                    document.getElementById('gananciaProducto').textContent = `Ganancia del Producto: S/. ${gananciaPorUnidad.toFixed(2)} (${porcentajeGanancia}%)`;
+                } else {
+                    document.getElementById('gananciaProducto').textContent = `Ganancia del Producto: S/. 0.00 (0%)`;
+                }
+
+                // Calcular la ganancia para los consumibles compuestos
+                const componentes = document.querySelectorAll('input[name^="componentes["]');
+                let costoCompuesto = 0;
+                componentes.forEach(input => {
+                    const cantidad = parseFloat(input.value);
+                    const precioUnitario = 10; // Ajusta según sea necesario
+                    costoCompuesto += cantidad * precioUnitario;
+                });
+
+                if (precioUnitario > 0) {
+                    const gananciaCompuesto = precioUnitario - (costoCompuesto / stock);
+                    const porcentajeGananciaCompuesto = ((gananciaCompuesto / (costoCompuesto / stock)) * 100).toFixed(2);
+
+                    document.getElementById('gananciaCompuesto').textContent = `Ganancia del Compuesto: S/. ${gananciaCompuesto.toFixed(2)} (${porcentajeGananciaCompuesto}%)`;
+                } else {
+                    document.getElementById('gananciaCompuesto').textContent = `Ganancia del Compuesto: S/. 0.00 (0%)`;
+                }
+            }
+
+            // Manejo del checkbox de consumible múltiple
+            document.getElementById('consumible_multiple').addEventListener('change', function() {
+                let esMultiple = this.checked;
+                document.getElementById('marca').disabled = esMultiple;
+                document.getElementById('marca').value = esMultiple ? 'Compuesto' : '';
+                document.getElementById('coste').disabled = esMultiple;
+                document.getElementById('stock').disabled = esMultiple;
+                document.querySelector('button[data-target="#categoriaModal"]').disabled = !esMultiple;
+            });
+
+            // Limpiar y restaurar campos de coste y precio
+            document.getElementById('coste').addEventListener('focus', function() {
+                if (this.value === 'S/. 0.00') {
+                    this.value = '';
+                }
+            });
+            document.getElementById('precio').addEventListener('focus', function() {
+                if (this.value === 'S/. 0.00') {
+                    this.value = '';
+                }
+            });
+            document.getElementById('coste').addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.value = 'S/. 0.00';
+                }
+            });
+            document.getElementById('precio').addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.value = 'S/. 0.00';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

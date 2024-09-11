@@ -67,13 +67,27 @@ class ArsenalController extends BaseController
             'nombre' => $nombre
         ]);
     }
-    public function getConsumiblesByCategoria() {
+    
+public function getConsumiblesByCategoria() {
+    header('Content-Type: application/json');
+    try {
+        if (!isset($_GET['id'])) {
+            throw new Exception('ID de categoría no especificado.');
+        }
+
         $categoriaId = $_GET['id'];
         $consumibles = $this->model->getConsumiblesByCategoria($categoriaId);
-        
+
         echo json_encode(['consumibles' => $consumibles]);
+    } catch (Exception $e) {
+        http_response_code(500); // Respuesta HTTP 500 en caso de error
+        echo json_encode(['error' => $e->getMessage()]);
     }
-    
+}
+
+
+
+
     public function showVentasRegistradas()
     {
         $nombre = $this->checkLogin();
@@ -88,11 +102,9 @@ class ArsenalController extends BaseController
         ]);
     }
     ////////////////////////////////////////////////ALMACENES///////////////////////////////////////////////////
-
     public function createConsumible()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Recoger los datos del formulario
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
             $marca = $_POST['marca'];
@@ -103,8 +115,7 @@ class ArsenalController extends BaseController
             $stock = $_POST['stock'];
             $coste = $_POST['coste'];
             $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : [];
-    
-            // Crear el consumible principal
+
             $consumibleId = $this->model->createConsumible(
                 $nombre,
                 $descripcion_consumible,
@@ -116,40 +127,38 @@ class ArsenalController extends BaseController
                 $stock,
                 $coste
             );
-    
+
             if ($consumibleId) {
-                // Asignar categorías al consumible
                 $this->model->assignCategoriasToConsumible($consumibleId, $categorias);
-    
-                // Procesar los componentes (consumibles hijos)
+
                 if (isset($_POST['componentes']) && isset($_POST['cantidad_componente'])) {
                     foreach ($_POST['componentes'] as $componenteId) {
                         $cantidad = $_POST['cantidad_componente'][$componenteId];
-    
-                        // Insertar en la tabla consumible_componentes
+
                         $this->model->addComponenteToConsumible($consumibleId, $componenteId, $cantidad);
-    
-                        // Descontar stock del componente
+
                         $this->model->descontarStockConsumible($componenteId, $cantidad);
                     }
                 }
-    
-                // Redirigir a la vista de consumibles
+
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
                 exit;
             } else {
                 echo "Failed to create consumible.";
             }
         } else {
+            // Obtener categorías y consumibles
             $categorias = $this->model->getAllCategorias();
-            $consumibles = $this->model->getAllConsumibles();  // Obtener todos los consumibles para seleccionarlos como componentes
+            $consumibles = $this->model->getAllConsumibles();
             $this->loadView('arsenal.createConsumible', [
                 'categorias' => $categorias,
-                'consumibles' => $consumibles  // Pasar los consumibles a la vista
+                'consumibles' => $consumibles
             ]);
         }
     }
-    
+
+
+
 
 
     public function editConsumible()
@@ -325,32 +334,31 @@ class ArsenalController extends BaseController
     }
 
 
-public function createVentaConsumible()
-{
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $productosSeleccionados = isset($_POST['productosSeleccionados']) ? json_decode($_POST['productosSeleccionados'], true) : [];
-        $metodoPago = isset($_POST['metodo_pago']) ? $_POST['metodo_pago'] : '';
+    public function createVentaConsumible()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $productosSeleccionados = isset($_POST['productosSeleccionados']) ? json_decode($_POST['productosSeleccionados'], true) : [];
+            $metodoPago = isset($_POST['metodo_pago']) ? $_POST['metodo_pago'] : '';
 
-        if (empty($productosSeleccionados)) {
-            echo json_encode(['error' => 'No se han seleccionado productos.']);
+            if (empty($productosSeleccionados)) {
+                echo json_encode(['error' => 'No se han seleccionado productos.']);
+                exit;
+            }
+
+            $totalVenta = 0;
+            foreach ($productosSeleccionados as $producto) {
+                $totalVenta += $producto['cantidad'] * $producto['precio'];
+            }
+
+            try {
+                $this->model->registrarVenta($productosSeleccionados, $totalVenta, $metodoPago);
+                echo json_encode(['success' => 'Venta registrada exitosamente.']);
+            } catch (Exception $e) {
+                echo json_encode(['error' => 'Error al registrar la venta: ' . $e->getMessage()]);
+            }
             exit;
         }
-
-        $totalVenta = 0;
-        foreach ($productosSeleccionados as $producto) {
-            $totalVenta += $producto['cantidad'] * $producto['precio'];
-        }
-
-        try {
-            $this->model->registrarVenta($productosSeleccionados, $totalVenta, $metodoPago);
-            echo json_encode(['success' => 'Venta registrada exitosamente.']);
-        } catch (Exception $e) {
-            echo json_encode(['error' => 'Error al registrar la venta: ' . $e->getMessage()]);
-        }
-        exit;
     }
-}
-
 }
 
 $action = $_GET['action'] ?? 'showArsenal';
