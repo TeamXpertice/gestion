@@ -17,6 +17,7 @@ error_reporting(E_ALL);
 <body>
     <div class="container mt-5">
         <h1>Crear Consumible</h1>
+         
         <form action="/gestion/app/controller/ArsenalController.php?action=createConsumible" method="post">
             <div class="form-row">
                 <div class="form-group col-md-4">
@@ -134,6 +135,7 @@ error_reporting(E_ALL);
     <!-- Incluye jQuery desde un CDN o archivo local -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
 
     <script>
         // Manejo de selección de categorías en el modal
@@ -361,7 +363,92 @@ document.getElementById('categoriasContainer').addEventListener('click', functio
             }
         });
     </script>
+<script>
+        $(document).ready(function() {
+            // Aplicar DataTables solo a la tabla de consumibles
+            $('.table:not(.table-categorias)').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+                },
+                dom: 'Bfrtip',
+                buttons: [{
+                        extend: 'excel',
+                        text: 'Excel',
+                        title: 'Bienes_Registrados'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        title: 'Bienes_Registrados',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        title: 'Bienes Registrados',
+                        exportOptions: {
+                            columns: ':not(:last-child)'
+                        }
+                    }
+                ]
+            });
 
+            // Sin DataTables para la tabla de categorías
+            $('#addCategoriaBtn').on('click', function() {
+                const nuevaCategoria = $('#nuevaCategoria').val();
+
+                if (nuevaCategoria) {
+                    fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `nombre=${encodeURIComponent(nuevaCategoria)}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                $('#categoriaModal').modal('hide');
+                                $('body').removeClass('modal-open');
+                                $('.modal-backdrop').remove();
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Categoría agregada!',
+                                    text: 'La categoría se ha agregado exitosamente.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                $('#nuevaCategoria').val('');
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Hubo un problema al agregar la categoría.'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Hubo un problema con la solicitud.'
+                            });
+                        });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campo vacío',
+                        text: 'Por favor, ingresa el nombre de la categoría.'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -85,9 +85,6 @@ public function getConsumiblesByCategoria() {
     }
 }
 
-
-
-
     public function showVentasRegistradas()
     {
         $nombre = $this->checkLogin();
@@ -107,44 +104,59 @@ public function getConsumiblesByCategoria() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
-            $marca = $_POST['marca'];
+            $marca = isset($_POST['marca']) && !empty($_POST['marca']) ? $_POST['marca'] : 'S/D';
             $unidad_medida = $_POST['unidad_medida'];
             $observacion = $_POST['observacion'];
+            $fecha_compra = $_POST['fecha_compra'];
             $fecha_vencimiento = $_POST['fecha_vencimiento'];
             $precio = $_POST['precio'];
-            $stock = $_POST['stock'];
-            $coste = $_POST['coste'];
-            $categorias = isset($_POST['categorias']) ? $_POST['categorias'] : [];
-
+            $stock = NULL; // El stock de los compuestos se calcula dinámicamente
+            $es_compuesto = isset($_POST['consumible_multiple']) ? 1 : 0;
+    
+            // Calcular el coste total si es un consumible compuesto
+            if ($es_compuesto && isset($_POST['componentes'])) {
+                $coste = 0;
+                foreach ($_POST['componentes'] as $componenteId => $datosComponente) {
+                    $cantidad = $datosComponente['cantidad'];
+                    $costeComponente = $datosComponente['precio'] * $cantidad;
+                    $coste += $costeComponente;
+                }
+            } else {
+                $coste = $_POST['coste'];
+            }
+    
+            // Insertar el nuevo consumible
             $consumibleId = $this->model->createConsumible(
                 $nombre,
                 $descripcion_consumible,
                 $marca,
                 $unidad_medida,
                 $observacion,
+                $fecha_compra,
                 $fecha_vencimiento,
                 $precio,
-                $stock,
-                $coste
+                $stock, // NULL para los compuestos
+                $coste,
+                $es_compuesto
             );
-
+    
             if ($consumibleId) {
-                $this->model->assignCategoriasToConsumible($consumibleId, $categorias);
-
-                if (isset($_POST['componentes']) && isset($_POST['cantidad_componente'])) {
-                    foreach ($_POST['componentes'] as $componenteId) {
-                        $cantidad = $_POST['cantidad_componente'][$componenteId];
-
+                // Asignar las categorías al consumible
+                if (isset($_POST['categorias'])) {
+                    $this->model->assignCategoriasToConsumible($consumibleId, $_POST['categorias']);
+                }
+    
+                // Si es un consumible compuesto, agregar los componentes
+                if ($es_compuesto && isset($_POST['componentes'])) {
+                    foreach ($_POST['componentes'] as $componenteId => $datosComponente) {
+                        $cantidad = $datosComponente['cantidad'];
                         $this->model->addComponenteToConsumible($consumibleId, $componenteId, $cantidad);
-
-                        $this->model->descontarStockConsumible($componenteId, $cantidad);
                     }
                 }
-
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
                 exit;
             } else {
-                echo "Failed to create consumible.";
+                echo "Error al crear consumible.";
             }
         } else {
             // Obtener categorías y consumibles
@@ -156,7 +168,7 @@ public function getConsumiblesByCategoria() {
             ]);
         }
     }
-
+    
 
 
 
@@ -211,11 +223,34 @@ public function getConsumiblesByCategoria() {
         $categoriaId = $_GET['categoria_id'];
         if ($categoriaId) {
             $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
+            
+            foreach ($consumibles as &$consumible) {
+                // Verificar si el campo es_compuesto está definido
+                $esCompuesto = isset($consumible['es_compuesto']) ? $consumible['es_compuesto'] : 0;
+    
+                if ($esCompuesto == 1) {
+                    // Si es un consumible compuesto, calcular el stock basado en los componentes
+                    $componentes = $this->model->getComponentesByConsumible($consumible['id']);
+                    
+                    $stockCompuesto = PHP_INT_MAX; // Empezar con un valor grande para encontrar el mínimo stock
+    
+                    foreach ($componentes as $componente) {
+                        $stockDisponible = floor($componente['stock'] / $componente['cantidad']);
+                        $stockCompuesto = min($stockCompuesto, $stockDisponible); // Tomar el menor stock
+                    }
+    
+                    $consumible['stock'] = $stockCompuesto; // Asignar el stock calculado al compuesto
+                    $consumible['componentes'] = $componentes; // Enviar también los componentes para mostrar en la vista
+                }
+            }
+    
             echo json_encode($consumibles);
         } else {
             echo json_encode([]);
         }
     }
+    
+
 
 
     public function addCategoria()
@@ -339,17 +374,17 @@ public function getConsumiblesByCategoria() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $productosSeleccionados = isset($_POST['productosSeleccionados']) ? json_decode($_POST['productosSeleccionados'], true) : [];
             $metodoPago = isset($_POST['metodo_pago']) ? $_POST['metodo_pago'] : '';
-
+    
             if (empty($productosSeleccionados)) {
                 echo json_encode(['error' => 'No se han seleccionado productos.']);
                 exit;
             }
-
+            
             $totalVenta = 0;
             foreach ($productosSeleccionados as $producto) {
                 $totalVenta += $producto['cantidad'] * $producto['precio'];
             }
-
+    
             try {
                 $this->model->registrarVenta($productosSeleccionados, $totalVenta, $metodoPago);
                 echo json_encode(['success' => 'Venta registrada exitosamente.']);
@@ -359,6 +394,11 @@ public function getConsumiblesByCategoria() {
             exit;
         }
     }
+    
+
+
+
+
 }
 
 $action = $_GET['action'] ?? 'showArsenal';
