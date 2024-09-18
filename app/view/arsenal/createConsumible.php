@@ -28,6 +28,8 @@ error_reporting(E_ALL);
                     <label for="consumible_multiple">Es un consumible compuesto:</label>
                     <input type="checkbox" id="consumible_multiple" name="consumible_multiple">
                 </div>
+                </div>
+                <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="marca">Marca:</label>
                     <input type="text" id="marca" name="marca" class="form-control">
@@ -57,11 +59,11 @@ error_reporting(E_ALL);
                 </div>
                 <div class="form-group col-md-2">
                     <label for="stock">Stock:</label>
-                    <input type="number" id="stock" name="stock" class="form-control" required>
+                    <input type="text" id="stock" name="stock" class="form-control" required min="0" placeholder="0">
                 </div>
                 <div class="form-group col-md-3">
                     <label for="coste">Costo Total del producto:</label>
-                    <input type="text" id="coste" name="coste" class="form-control" value="S/. 0.00">
+                    <input type="text" id="coste" name="coste" class="form-control" value="S/. 0.00" required >
                 </div>
                 <div class="form-group col-md-2">
                     <label for="precio">Precio Unitario:</label>
@@ -81,11 +83,11 @@ error_reporting(E_ALL);
             <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
-                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control">
+                    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
                     <label for="fecha_compra">Fecha de Compra:</label>
-                    <input type="date" id="fecha_compra" name="fecha_compra" class="form-control">
+                    <input type="date" id="fecha_compra" name="fecha_compra" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                 </div>
             </div>
 
@@ -138,16 +140,16 @@ error_reporting(E_ALL);
     
 
     <script>
-        // Manejo de selección de categorías en el modal
+        // CONTROL DEL CLICK QUE MANJE ALAS CATEGORIAS
 document.getElementById('categoriasContainer').addEventListener('click', function(event) {
     if (event.target.classList.contains('categoria-btn')) {
         let categoriaId = event.target.getAttribute('data-id');
         let consumiblesContainer = document.getElementById('consumiblesContainer');
 
-        // Mostrar un mensaje de "Cargando..." mientras se realiza la solicitud
+        // MENSAJE CARGAR CONSUMIBLES
         consumiblesContainer.innerHTML = '<p>Cargando consumibles...</p>';
 
-        // Solicitud AJAX para obtener los consumibles por categoría
+        // SOLICITUD PARA TENER LOS CONSUMIBLES Y CATEGORIAS
         fetch(`/gestion/app/controller/ArsenalController.php?action=getConsumiblesByCategoria&id=${categoriaId}`)
             .then(response => {
                 if (!response.ok) {
@@ -156,33 +158,55 @@ document.getElementById('categoriasContainer').addEventListener('click', functio
                 return response.json();
             })
             .then(data => {
-                consumiblesContainer.innerHTML = ''; // Limpiamos el contenedor antes de agregar nuevos consumibles
+                consumiblesContainer.innerHTML = ''; // Limpia el contenedor antes de agregar nuevos consumibles
 
-                if (data.consumibles && data.consumibles.length > 0) {
-                    data.consumibles.forEach(consumible => {
-                        const consumibleHtml = `
-                            <div class="consumible-item">
-                                <span>${consumible.nombre} - Stock: ${consumible.stock}</span>
-                                <input type="number" min="1" max="${consumible.stock}" value="1" id="cantidad_${consumible.id}">
-                                <button type="button" class="btn btn-success agregar-consumible" 
-                                    data-id="${consumible.id}" 
-                                    data-nombre="${consumible.nombre}" 
-                                    data-precio="${consumible.precio}" 
-                                    data-stock="${consumible.stock}">
-                                    Agregar
-                                </button>
-                            </div>
-                        `;
-                        consumiblesContainer.insertAdjacentHTML('beforeend', consumibleHtml);
-                    });
-                } else {
-                    consumiblesContainer.innerHTML = '<p>No hay consumibles disponibles en esta categoría.</p>';
-                }
-            })
+if (data.consumibles && data.consumibles.length > 0) {
+    data.consumibles.forEach(consumible => {
+        // Crear el contenedor para cada consumible
+        const consumibleItem = document.createElement('div');
+        consumibleItem.classList.add('consumible-item');
+        
+        // Crear el span que contiene el nombre y el stock del consumible
+        const consumibleSpan = document.createElement('span');
+        consumibleSpan.textContent = `${consumible.nombre} - Stock: ${consumible.stock}`;
+        consumibleItem.appendChild(consumibleSpan);
+
+        // Crear el input para la cantidad
+        const cantidadInput = document.createElement('input');
+        cantidadInput.type = 'number';
+        cantidadInput.min = 0;
+        cantidadInput.max = consumible.stock;
+        cantidadInput.value = 1;
+        cantidadInput.id = `cantidad_${consumible.id}`;
+        consumibleItem.appendChild(cantidadInput);
+
+        // Crear el botón de agregar consumible
+        const agregarButton = document.createElement('button');
+        agregarButton.type = 'button';
+        agregarButton.classList.add('btn', 'btn-success', 'agregar-consumible');
+        agregarButton.dataset.id = consumible.id;
+        agregarButton.dataset.nombre = consumible.nombre;
+        agregarButton.dataset.precio = consumible.precio;
+        agregarButton.dataset.stock = consumible.stock;
+        agregarButton.textContent = 'Agregar';
+        consumibleItem.appendChild(agregarButton);
+
+        // Agregar el consumible al contenedor
+        consumiblesContainer.appendChild(consumibleItem);
+    });
+} else {
+    // Si no hay consumibles, mostramos un mensaje
+    consumiblesContainer.innerHTML = '<p>No hay consumibles disponibles en esta categoría.</p>';
+}
+})
             .catch(error => {
-                consumiblesContainer.innerHTML = `<p>Error al cargar consumibles: ${error.message}</p>`;
-                console.error('Error al obtener los consumibles:', error);
-            });
+    consumiblesContainer.innerHTML = `
+        <div class="alert alert-danger">
+            Error al cargar consumibles: ${error.message}. Por favor, intenta nuevamente.
+        </div>
+    `;
+    console.error('Error al obtener los consumibles:', error);
+});
     }
 });
 

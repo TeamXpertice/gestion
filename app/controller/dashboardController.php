@@ -1,17 +1,30 @@
 <?php
 require_once 'BaseController.php';
+require_once __DIR__ . '/../model/Dashboard.php';
 
-class dashboardController extends BaseController {
+class DashboardController extends BaseController {
+    private $model;
+
+    public function __construct()
+    {
+        $this->model = new Dashboard();
+    }
+
     public function showDashboard() {
-        $nombre = $this->checkLogin(); 
-        $this->loadView('dashboard.dashboard', ['nombre' => $nombre]);
+        $nombre = $this->checkLogin();
+        $productosPorVencer = $this->model->obtenerProductosPorVencer();
+        $this->loadView('dashboard.dashboard', [
+            'nombre' => $nombre,
+            'productosPorVencer' => $productosPorVencer
+        ]);
     }
 }
 
 if (isset($_GET['action'])) {
-    $controller = new dashboardController();
+    $controller = new DashboardController();
     $action = $_GET['action'];
-    $controller->$action();
+    if (method_exists($controller, $action)) {
+        $controller->$action();
+        echo "Error: Acción no encontrada.";
+    }
 }
-
-?>

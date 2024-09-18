@@ -1,8 +1,7 @@
 <?php
 require_once 'BaseModel.php';
 
-class Arsenal extends BaseModel
-{
+class Arsenal extends BaseModel{
 
     public function getBienes()
     {

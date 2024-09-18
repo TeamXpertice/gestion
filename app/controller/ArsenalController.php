@@ -11,6 +11,9 @@ class ArsenalController extends BaseController
         $this->model = new Arsenal();
     }
     ////////////////////////////////////////////////SHOWS///////////////////////////////////////////////////
+
+
+
     public function showArsenal()
     {
         $nombre = $this->checkLogin();
