@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema</title>
     
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/gestion/public/css/stackpathbootstrap4.5.2.css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
     <!-- data table -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
@@ -74,8 +74,7 @@
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="comprasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Compras</a>
                     <div class="dropdown-menu" aria-labelledby="comprasDropdown">
-                    <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showCompras">Registrar Nueva Compra</a>
-
+                        <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showCompras">Registrar Nueva Compra</a>
                         <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showRegistroCompras">Registro de Compras</a>
                     </div>
                 </div>

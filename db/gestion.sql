@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-09-2024 a las 18:09:57
+-- Tiempo de generación: 19-09-2024 a las 18:23:04
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -228,7 +228,6 @@ ALTER TABLE `consumibles_categorias`
 --
 ALTER TABLE `consumible_componentes`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id_consumible_2` (`id_consumible`,`id_componente`),
   ADD KEY `id_consumible` (`id_consumible`),
   ADD KEY `id_componente` (`id_componente`);
 
@@ -299,8 +298,8 @@ ALTER TABLE `consumibles_categorias`
 -- Filtros para la tabla `consumible_componentes`
 --
 ALTER TABLE `consumible_componentes`
-  ADD CONSTRAINT `consumible_componentes_ibfk_1` FOREIGN KEY (`id_consumible`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `consumible_componentes_ibfk_2` FOREIGN KEY (`id_componente`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_componente` FOREIGN KEY (`id_componente`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_consumible` FOREIGN KEY (`id_consumible`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

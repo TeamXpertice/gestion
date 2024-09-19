@@ -1,14 +1,11 @@
 <?php
-
 require_once 'BaseController.php';
 require_once __DIR__ . '/../model/Login.php';
-
 class LoginController extends BaseController {
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $correo = $_POST['correo'];
             $contrasena = $_POST['contrasena'];
-            
             $loginModel = new Login();
             $user = $loginModel->authenticate($correo, $contrasena);
     

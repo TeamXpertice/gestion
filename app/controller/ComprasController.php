@@ -1,24 +1,12 @@
 <?php
 require_once 'BaseController.php';
 require_once __DIR__ . '/../model/Compras.php';
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-class ComprasController extends BaseController {
 
+class ComprasController extends BaseController {
     private $model;
 
     public function __construct() {
         $this->model = new Compras();
-    }
-
-    public function showCompras() {
-        $nombre = $this->checkLogin();
-        $categorias = $this->model->getAllCategorias();
-        $this->loadView('compras.createCompra', [
-            'nombre' => $nombre,
-            'categorias' => $categorias 
-        ]);
     }
     public function showRegistroCompras() {
         $nombre = $this->checkLogin();
@@ -33,13 +21,22 @@ class ComprasController extends BaseController {
             'totalPorMetodo' => $totalPorMetodo
         ]);
     }
+    public function showCompras() {
+        $nombre = $this->checkLogin();
+        $categorias = $this->model->getAllCategorias();
+        $this->loadView('compras.createCompra', [
+            'nombre' => $nombre,
+            'categorias' => $categorias 
+        ]);
+    }
+
     public function registrarCompraConsumibles($productos, $proveedor, $metodo_pago) {
         foreach ($productos as $producto) {
             $consumible_id = $producto['id'] ?? null;
             $cantidad = $producto['cantidad'] ?? null;
             $costo_unitario = $producto['coste'] ?? null;
             $observacion = $producto['observacion'] ?? null;
-    
+
             if ($consumible_id && $cantidad && $costo_unitario) {
                 $this->model->reponerStock($consumible_id, $cantidad);
                 $this->model->registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, date('Y-m-d'), $observacion, $proveedor, $metodo_pago);
@@ -49,9 +46,9 @@ class ComprasController extends BaseController {
         }
         return true;
     }
+
     public function createCompra() {
         $action = $_POST['action'] ?? '';
-    
         if ($action === 'normal') {
             $descripcion = $_POST['descripcion'] ?? '';
             $cantidad = $_POST['cantidad'] ?? 0;
@@ -60,34 +57,36 @@ class ComprasController extends BaseController {
             $proveedor = $_POST['proveedor'] ?? '';
             $metodo_pago = $_POST['metodo_pago'] ?? '';
             $observacion = $_POST['observacion'] ?? '';
-    
+
             $result = $this->model->registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $fecha, $proveedor, $metodo_pago, $observacion);
             echo json_encode(['success' => $result]);
         } elseif ($action === 'consumible') {
             $productos = json_decode($_POST['productosSeleccionados'], true);
             $proveedor = $_POST['proveedor'] ?? '';
             $metodo_pago = $_POST['metodo_pago'] ?? '';
-    
+
             if ($productos && $this->registrarCompraConsumibles($productos, $proveedor, $metodo_pago)) {
                 echo json_encode(['success' => true]);
             } else {
-                echo json_encode(['success' => false, 'redirect' => '/gestion/app/view/registrarCompraConsumibles.php']);
+                echo json_encode(['success' => false]);
             }
         } else {
-            echo json_encode(['success' => false, 'redirect' => '/gestion/app/view/registrarCompraConsumibles.php']);
+            echo json_encode(['success' => false]);
         }
     }
+
     public function getConsumiblesPorCategoria() {
         $categoriaId = $_GET['categoria_id'] ?? null;
         if ($categoriaId) {
             $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
-            echo json_encode($consumibles);
+            echo json_encode(array_filter($consumibles, function($consumible) {
+                return $consumible['stock'] !== null; // Filtrar consumibles con stock null
+            }));
         } else {
             echo json_encode([]);
         }
         exit;
     }
-    
 }
 
 $action = $_GET['action'] ?? 'showCompras';
@@ -95,6 +94,6 @@ $controller = new ComprasController();
 if (method_exists($controller, $action)) {
     $controller->$action($_GET['id'] ?? null);
 } else {
-    $controller->showCompras(); // Acción por defecto
+    $controller->showCompras();
 }
 ?>

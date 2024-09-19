@@ -22,8 +22,10 @@
     <!-- Cuadro de productos por vencer -->
     <h2>Productos a un día de vencer</h2>
     <div id="productosPorVencer">
-        <?php if (!empty($productosPorVencer)): ?>
-            <?php foreach ($productosPorVencer as $producto): ?>
+
+
+        <?php if (!empty($productosConStock)): ?>
+            <?php foreach ($productosConStock as $producto): ?>
                 <div class="producto-cuadro">
                     <p><strong>Producto:</strong> <?php echo htmlspecialchars($producto['nombre']); ?></p>
                     <p><strong>Fecha de vencimiento:</strong> <?php echo htmlspecialchars($producto['fecha_vencimiento']); ?></p>
@@ -31,7 +33,7 @@
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p>No hay productos a punto de vencer en el día de mañana.</p>
+            <p>No hay productos con stock a punto de vencer en el día de mañana.</p>
         <?php endif; ?>
     </div>
 

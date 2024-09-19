@@ -269,17 +269,7 @@ class Arsenal extends BaseModel{
 
 
 
-    public function getConsumiblesByCategoria($categoriaId)
-    {
-        $sql = "SELECT c.* 
-            FROM consumibles c 
-            INNER JOIN consumibles_categorias cc ON c.id = cc.consumible_id 
-            WHERE cc.categoria_id = :categoriaId";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':categoriaId', $categoriaId, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+
     public function getComponentesByConsumible($consumibleId)
     {
         $sql = "SELECT c.id, c.nombre, c.stock, cc.cantidad 
@@ -300,7 +290,17 @@ class Arsenal extends BaseModel{
         $stmt->execute([$categoriaId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+    public function getConsumiblesByCategoria($categoriaId)
+    {
+        $sql = "SELECT c.* 
+            FROM consumibles c 
+            INNER JOIN consumibles_categorias cc ON c.id = cc.consumible_id 
+            WHERE cc.categoria_id = :categoriaId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':categoriaId', $categoriaId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 
 

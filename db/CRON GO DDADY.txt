@@ -1,0 +1,55 @@
+Paso 1: Preparar tu Archivo para el Cron Job
+Antes de mover tu proyecto a GoDaddy, asegúrate de que el archivo PHP que va a reducir el stock de productos vencidos esté en el lugar correcto en tu proyecto. Como mencionamos antes, lo puedes colocar en la carpeta app/ (por ejemplo, gestion/app/reducirStockVencidos.php).
+
+Paso 2: Subir tu Proyecto a GoDaddy
+Cuando estés listo para pasar de local a tu servidor en GoDaddy, debes subir tu proyecto mediante FTP (File Transfer Protocol) o usando el administrador de archivos de GoDaddy.
+
+Paso 3: Configurar el Cron Job en GoDaddy
+Una vez que tu proyecto esté en GoDaddy, aquí te explico cómo configurar el cron job para que se ejecute automáticamente.
+
+1. Acceder a tu Hosting GoDaddy
+Inicia sesión en tu cuenta de GoDaddy.
+Desde el Panel de control de GoDaddy, busca la opción de cPanel o Administrador de Hosting (dependiendo del plan que tengas). Si usas cPanel, te explico los pasos a continuación.
+2. Abrir Cron Jobs en cPanel
+En cPanel, busca una sección llamada Advanced o Avanzado.
+
+Dentro de esta sección, haz clic en Cron Jobs.
+
+
+3. Configurar el Cron Job
+En la página de cron jobs, verás una opción que dice Add New Cron Job o Agregar Nuevo Cron Job.
+
+En el campo de Common Settings (Configuraciones comunes), puedes elegir una opción predefinida. Para ejecutar el cron job todos los días a la medianoche, selecciona la opción de Once Per Day (Una vez al día).
+
+En el campo de Command (Comando), debes ingresar el comando que ejecutará tu archivo PHP. El formato sería algo como esto:
+
+
+/usr/local/bin/php /home/tu_usuario/public_html/gestion/app/reducirStockVencidos.php
+/usr/local/bin/php es la ruta al ejecutable de PHP en GoDaddy (puede variar, pero es la más común).
+/home/tu_usuario/public_html/gestion/app/reducirStockVencidos.php es la ruta completa a tu archivo reducirStockVencidos.php en el servidor. Asegúrate de que esta ruta sea correcta en función de dónde esté ubicado tu archivo dentro del sistema de directorios de GoDaddy.
+Si no sabes cuál es la ruta exacta, puedes encontrarla a través de cPanel navegando por el Administrador de Archivos o consultando el soporte de GoDaddy.
+
+Haz clic en Add New Cron Job (Agregar Nuevo Cron Job) para guardar la configuración.
+
+4. Verificar que el Cron Job Funciona
+Una vez que hayas configurado el cron job, GoDaddy lo ejecutará de acuerdo con el horario que especificaste. Para verificar si todo está funcionando correctamente, puedes hacer lo siguiente:
+
+Verificar el log del cron job: En la página de cron jobs de cPanel, puedes habilitar la opción de que te envíe un correo electrónico cada vez que el cron job se ejecute. Esto te ayudará a confirmar que el cron job está funcionando.
+
+Probar manualmente: Si quieres probar que el archivo se ejecuta correctamente, puedes ejecutar el archivo directamente desde tu navegador o línea de comandos. Por ejemplo, si subiste el archivo a /public_html/gestion/app/reducirStockVencidos.php, podrías acceder a:
+
+
+https://tu-dominio.com/gestion/app/reducirStockVencidos.php
+Esto te permitirá ver si el script funciona correctamente.
+
+Paso 4: Trabajar Localmente
+Mientras sigas trabajando de forma local, no podrás usar cron jobs, ya que estos dependen de un servidor configurado para tareas automáticas. Sin embargo, puedes simular el comportamiento ejecutando manualmente tu archivo PHP que reduce el stock vencido. Simplemente accede al archivo desde tu navegador o línea de comandos:
+
+php /ruta/a/tu/proyecto/gestion/app/reducirStockVencidos.php
+
+
+
+REVEISAR RUTA PARA CUALQUIER COSA
+
+
+http://localhosthttps://code.jquery.com/jquery-3.5.1.min.js"

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Nueva Compra</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/gestion/public/css/stackpathbootstrap4.5.2.css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/gestion/public/css/style.css">
     <style>
         .category-button {
@@ -64,12 +64,10 @@
     <div class="container mt-1">
         <h2>Registrar Nueva Compra</h2>
 
-        <!-- Botón para abrir el modal -->
         <div class="mb-4">
             <button class="btn btn-primary" data-toggle="modal" data-target="#createCompraModal">Registrar Nueva Compra Comun</button>
         </div>
 
-        <!-- Modal de Registrar Nueva Compra -->
         <div class="modal fade" id="createCompraModal" tabindex="-1" aria-labelledby="createCompraModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -122,7 +120,6 @@
         </div>
 
         <div class="row">
-            <!-- Listado de Categorías -->
             <div class="col-md-6">
                 <h3>Tipos de Material</h3>
                 <div class="row" id="materialList">
@@ -150,20 +147,15 @@
                     }
                     ?>
                 </div>
-                <div id="consumiblesList" class="mt-4">
-                    <!-- Aquí se mostrarán los consumibles al seleccionar una categoría -->
-                </div>
+                <div id="consumiblesList" class="mt-4"></div>
             </div>
 
-            <!-- Previsualización y Registro de la Compra -->
             <div class="col-md-6">
                 <h3>Previsualización de Compra</h3>
                 <div id="compraPreview">
                     <p>No hay productos seleccionados.</p>
                 </div>
-                <div id="totalCompra" class="mt-3">
-                    <!-- Aquí se mostrará el total de la compra -->
-                </div>
+                <div id="totalCompra" class="mt-3"></div>
                 <form id="compraConsumiblesForm" method="post">
                     <input type="hidden" id="productosSeleccionados" name="productosSeleccionados">
                     <div class="form-group">
@@ -181,7 +173,6 @@
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
 
-    <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -210,7 +201,7 @@
                         var json = JSON.parse(response);
                         if (json.success) {
                             alert('Compra normal registrada exitosamente.');
-                            // Redirige o actualiza la vista según sea necesario
+                            $('#createCompraModal').modal('hide');
                         } else {
                             alert('Error: ' + json.error);
                         }
@@ -223,6 +214,7 @@
                 }
             });
         });
+
         $('#compraConsumiblesForm').on('submit', function(e) {
             e.preventDefault();
 
@@ -230,9 +222,7 @@
                 alert('Debes seleccionar al menos un producto para registrar la compra.');
                 return;
             }
-            var nombresConsumibles = productosSeleccionados.map(function(producto) {
-                return producto.nombre; // Ajusta esto según la estructura de tus datos
-            });
+
             $.ajax({
                 url: '/gestion/app/controller/ComprasController.php?action=createCompra',
                 type: 'POST',
@@ -261,10 +251,7 @@
             });
         });
 
-
         function mostrarConsumiblesPorCategoria(categoriaId) {
-            $('#categoriaActual').val(categoriaId); // Guardar la categoría seleccionada
-
             $.ajax({
                 url: '/gestion/app/controller/ComprasController.php',
                 type: 'GET',
@@ -273,22 +260,20 @@
                     categoria_id: categoriaId
                 },
                 success: function(response) {
-                    console.log(response);
                     try {
                         var consumibles = JSON.parse(response);
                         var html = '';
-                        // Convertir la respuesta en un objeto JSON
                         if (consumibles.length > 0) {
                             html += '<ul class="list-group">';
                             consumibles.forEach(function(consumible) {
-                                // No deshabilitar si estamos en la vista de compras
-                                var disabledClass = ''; // Para compras, no deshabilitar consumibles con stock 0
-                                html += '<li class="list-group-item ' + disabledClass + '">' +
-                                    '<strong>' + consumible.nombre + '</strong><br>' +
-                                    'Stock: ' + consumible.stock + '<br>' +
-                                    'Costo: $' + consumible.coste + '<br>' +
-                                    '<button class="btn btn-sm btn-primary mt-2" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.coste + ', ' + consumible.stock + ')">Agregar</button>' +
-                                    '</li>';
+                                if (consumible.stock !== null && consumible.stock > 0) { // Verificar stock
+                                    html += '<li class="list-group-item">' +
+                                        '<strong>' + consumible.nombre + '</strong><br>' +
+                                        'Stock: ' + consumible.stock + '<br>' +
+                                        'Costo: $' + consumible.coste + '<br>' +
+                                        '<button class="btn btn-sm btn-primary mt-2" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.coste + ', ' + consumible.stock + ')">Agregar</button>' +
+                                        '</li>';
+                                }
                             });
                             html += '</ul>';
                         } else {
@@ -334,17 +319,15 @@
 
             if (productosSeleccionados.length > 0) {
                 html += '<ul class="list-group">';
-                productosSeleccionados.forEach(function(producto, index) {
+                productosSeleccionados.forEach(function(producto) {
                     var subtotal = producto.cantidad * producto.coste;
                     total += subtotal;
                     html += '<li class="list-group-item">' +
                         '<strong>' + producto.nombre + '</strong><br>' +
                         'Cantidad: ' + producto.cantidad + '<br>' +
                         'Subtotal: $' + subtotal.toFixed(2) + '<br>' +
-                        'Observación: ' + (producto.observacion ? producto.observacion : 'Ninguna') + '<br>' +
-                        '<button class="btn btn-sm btn-secondary mt-2" onclick="incrementarCantidad(' + index + ')">+</button> ' +
-                        '<button class="btn btn-sm btn-secondary mt-2" onclick="decrementarCantidad(' + index + ')">-</button> ' +
-                        '<button class="btn btn-sm btn-warning mt-2" onclick="editarObservacion(' + index + ')">Editar Observación</button>' +
+                        '<button class="btn btn-sm btn-secondary mt-2" onclick="incrementarCantidad(' + producto.id + ')">+</button> ' +
+                        '<button class="btn btn-sm btn-secondary mt-2" onclick="decrementarCantidad(' + producto.id + ')">-</button>' +
                         '</li>';
                 });
                 html += '</ul>';
@@ -358,26 +341,24 @@
             }
         }
 
-        function incrementarCantidad(index) {
-            productosSeleccionados[index].cantidad++;
-            actualizarPrevisualizacion();
+        function incrementarCantidad(id) {
+            var producto = productosSeleccionados.find(p => p.id === id);
+            if (producto) {
+                producto.cantidad++;
+                actualizarPrevisualizacion();
+            }
         }
 
-        function decrementarCantidad(index) {
-            if (productosSeleccionados[index].cantidad > 1) {
-                productosSeleccionados[index].cantidad--;
-            } else {
-                productosSeleccionados.splice(index, 1);
+        function decrementarCantidad(id) {
+            var producto = productosSeleccionados.find(p => p.id === id);
+            if (producto) {
+                if (producto.cantidad > 1) {
+                    producto.cantidad--;
+                } else {
+                    productosSeleccionados = productosSeleccionados.filter(p => p.id !== id);
+                }
+                actualizarPrevisualizacion();
             }
-            actualizarPrevisualizacion();
-        }
-
-        function editarObservacion(index) {
-            var nuevaObservacion = prompt('Ingrese la nueva observación:', productosSeleccionados[index].observacion);
-            if (nuevaObservacion !== null) {
-                productosSeleccionados[index].observacion = nuevaObservacion;
-            }
-            actualizarPrevisualizacion();
         }
     </script>
 </body>
