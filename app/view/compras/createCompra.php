@@ -80,8 +80,8 @@
                     <div class="modal-body">
                         <form id="compraNormalForm" method="post">
                             <div class="form-group">
-                                <label for="descripcion">Descripción</label>
-                                <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                                <label for="descripcion_compra">Descripción</label>
+                                <input type="text" class="form-control" id="descripcion_compra" name="descripcion_compra" required>
                             </div>
                             <div class="form-group">
                                 <label for="cantidad">Cantidad</label>
@@ -90,6 +90,10 @@
                             <div class="form-group">
                                 <label for="costo_unitario">Costo Unitario</label>
                                 <input type="text" class="form-control" id="costo_unitario" name="costo_unitario" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="total">Total</label>
+                                <input type="number" class="form-control" id="total" name="total" required disabled>
                             </div>
                             <div class="form-group">
                                 <label for="fecha">Fecha de Compra</label>
@@ -178,6 +182,25 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
+
+function calcularCostoTotal() {
+    const costoUnitario = parseFloat(document.getElementById('costo_unitario').value) || 0; // Costo unitario
+    const cantidad = parseFloat(document.getElementById('cantidad').value) || 0; // Cantidad
+    const total = document.getElementById('total'); // campo de total
+
+    if (costoUnitario > 0 && cantidad > 0) {
+        const costoTotal = costoUnitario * cantidad;
+
+        total.value = costoTotal.toFixed(2); 
+    } else {
+        total.value = ''; 
+    }
+}
+
+// Asegúrate de que esta función se llame cuando los valores cambien
+document.getElementById('cantidad').addEventListener('input', calcularCostoTotal);
+document.getElementById('costo_unitario').addEventListener('input', calcularCostoTotal);
+
         var productosSeleccionados = [];
 
         $('#compraNormalForm').on('submit', function(e) {
@@ -188,10 +211,11 @@
                 type: 'POST',
                 data: {
                     action: 'normal',
-                    descripcion: $('#descripcion').val(),
+                    descripcion_compra: $('#descripcion_compra').val(),
                     cantidad: $('#cantidad').val(),
                     costo_unitario: $('#costo_unitario').val(),
-                    fecha: $('#fecha').val(),
+                    total: $('#total').val(),
+                    fecha_compra: $('#fecha_compra').val(),
                     proveedor: $('#proveedor').val(),
                     metodo_pago: $('#metodo_pago').val(),
                     observacion: $('#observacion').val()
@@ -237,7 +261,6 @@
                         var json = JSON.parse(response);
                         if (json.success) {
                             alert('Compra de consumibles registrada exitosamente.');
-                            // Redirige o actualiza la vista según sea necesario
                         } else {
                             alert('Error: ' + json.error);
                         }

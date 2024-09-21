@@ -5,7 +5,7 @@ class Dashboard extends BaseModel {
 
     public function obtenerProductosPorVencer($limite = 3) {
         $hoy = date('Y-m-d');
-        $pasadoManana = date('Y-m-d', strtotime('+2 days')); // Cambiar el rango a dos días
+        $pasadoManana = date('Y-m-d', strtotime('+2 days'));
     
         $sql = "SELECT nombre, fecha_vencimiento, stock FROM consumibles 
                 WHERE fecha_vencimiento BETWEEN :hoy AND :pasadoManana

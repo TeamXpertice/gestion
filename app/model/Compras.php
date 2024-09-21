@@ -28,24 +28,28 @@ class Compras extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $fecha, $proveedor, $metodo_pago, $observacion) {
+    public function registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $total, $fecha, $proveedor, $metodo_pago, $observacion) {
         try {
-            $sql = "INSERT INTO compras_normales (descripcion, cantidad, costo_unitario, fecha, proveedor, metodo_pago, observacion)
-                    VALUES (:descripcion, :cantidad, :costo_unitario, :fecha, :proveedor, :metodo_pago, :observacion)";
+            $sql = "INSERT INTO compras_normales (descripcion, cantidad, costo_unitario, total, fecha, proveedor, metodo_pago, observacion)
+                    VALUES (:descripcion, :cantidad, :costo_unitario, :total, :fecha, :proveedor, :metodo_pago, :observacion)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':descripcion', $descripcion);
             $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
             $stmt->bindParam(':costo_unitario', $costo_unitario);
+            $stmt->bindParam(':total', $total);
             $stmt->bindParam(':fecha', $fecha);
             $stmt->bindParam(':proveedor', $proveedor);
             $stmt->bindParam(':metodo_pago', $metodo_pago);
             $stmt->bindParam(':observacion', $observacion);
+    
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log('Error al registrar compra normal: ' . $e->getMessage());
             return false;
         }
     }
+    
+    
 
     public function registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, $fecha, $observacion, $proveedor, $metodo_pago) {
         $query = "SELECT nombre FROM consumibles WHERE id = :consumible_id";

@@ -74,7 +74,7 @@
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="comprasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Compras</a>
                     <div class="dropdown-menu" aria-labelledby="comprasDropdown">
-                        <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showCompras">Registrar Nueva Compra</a>
+                        <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showCompras">Nueva Compra</a>
                         <a class="dropdown-item" href="/gestion/app/controller/ComprasController.php?action=showRegistroCompras">Registro de Compras</a>
                     </div>
                 </div>

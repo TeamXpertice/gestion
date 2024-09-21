@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-09-2024 a las 18:23:04
+-- Tiempo de generación: 21-09-2024 a las 19:24:25
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -113,6 +113,25 @@ CREATE TABLE `compras` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `compras_normales`
+--
+
+CREATE TABLE `compras_normales` (
+  `id` int(11) NOT NULL,
+  `descripcion_compra` varchar(255) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `costo_unitario` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `fecha_compra` date NOT NULL,
+  `proveedor` varchar(255) DEFAULT NULL,
+  `metodo_pago` enum('Efectivo','Visa','Yape','Plin') NOT NULL,
+  `observacion` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `consumibles`
 --
 
@@ -153,6 +172,20 @@ CREATE TABLE `consumible_componentes` (
   `id_consumible` int(11) NOT NULL,
   `id_componente` int(11) NOT NULL,
   `cantidad` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `lotes`
+--
+
+CREATE TABLE `lotes` (
+  `id` int(11) NOT NULL,
+  `consumible_id` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `fecha_vencimiento` date NOT NULL,
+  `fecha_compra` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -211,6 +244,12 @@ ALTER TABLE `compras`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `compras_normales`
+--
+ALTER TABLE `compras_normales`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `consumibles`
 --
 ALTER TABLE `consumibles`
@@ -230,6 +269,13 @@ ALTER TABLE `consumible_componentes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_consumible` (`id_consumible`),
   ADD KEY `id_componente` (`id_componente`);
+
+--
+-- Indices de la tabla `lotes`
+--
+ALTER TABLE `lotes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `consumible_id` (`consumible_id`);
 
 --
 -- Indices de la tabla `ventas`
@@ -260,6 +306,12 @@ ALTER TABLE `compras`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `compras_normales`
+--
+ALTER TABLE `compras_normales`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `consumibles`
 --
 ALTER TABLE `consumibles`
@@ -269,6 +321,12 @@ ALTER TABLE `consumibles`
 -- AUTO_INCREMENT de la tabla `consumible_componentes`
 --
 ALTER TABLE `consumible_componentes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `lotes`
+--
+ALTER TABLE `lotes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -300,6 +358,12 @@ ALTER TABLE `consumibles_categorias`
 ALTER TABLE `consumible_componentes`
   ADD CONSTRAINT `fk_componente` FOREIGN KEY (`id_componente`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_consumible` FOREIGN KEY (`id_consumible`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `lotes`
+--
+ALTER TABLE `lotes`
+  ADD CONSTRAINT `lotes_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

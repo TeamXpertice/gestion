@@ -101,7 +101,6 @@ class ArsenalController extends BaseController
                 $stock = $_POST['stock'];
             }
     
-            // Insertar el nuevo consumible
             $consumibleId = $this->model->createConsumible(
                 $nombre,
                 $descripcion_consumible,
@@ -111,18 +110,16 @@ class ArsenalController extends BaseController
                 $fecha_compra,
                 $fecha_vencimiento,
                 $precio,
-                $stock, // Aquí usamos NULL para compuestos o el valor de stock para simples
+                $stock, 
                 $coste,
                 $es_compuesto
             );
     
             if ($consumibleId) {
-                // Asignar las categorías al consumible
                 if (isset($_POST['categorias'])) {
                     $this->model->assignCategoriasToConsumible($consumibleId, $_POST['categorias']);
                 }
     
-                // Si es un consumible compuesto, agregar los componentes
                 if ($es_compuesto && isset($_POST['componentes'])) {
                     foreach ($_POST['componentes'] as $componenteId => $datosComponente) {
                         $cantidad = $datosComponente['cantidad'];
@@ -135,7 +132,6 @@ class ArsenalController extends BaseController
                 echo "Error al crear consumible.";
             }
         } else {
-            // Obtener categorías y consumibles
             $categorias = $this->model->getAllCategorias();
             $consumibles = $this->model->getAllConsumibles();
             $this->loadView('arsenal.createConsumible', [
@@ -319,22 +315,20 @@ class ArsenalController extends BaseController
             $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
             
             foreach ($consumibles as &$consumible) {
-                // Verificar si el campo es_compuesto está definido
                 $esCompuesto = isset($consumible['es_compuesto']) ? $consumible['es_compuesto'] : 0;
     
                 if ($esCompuesto == 1) {
-                    // Si es un consumible compuesto, calcular el stock basado en los componentes
                     $componentes = $this->model->getComponentesByConsumible($consumible['id']);
                     
-                    $stockCompuesto = PHP_INT_MAX; // Empezar con un valor grande para encontrar el mínimo stock
+                    $stockCompuesto = PHP_INT_MAX; 
     
                     foreach ($componentes as $componente) {
                         $stockDisponible = floor($componente['stock'] / $componente['cantidad']);
-                        $stockCompuesto = min($stockCompuesto, $stockDisponible); // Tomar el menor stock
+                        $stockCompuesto = min($stockCompuesto, $stockDisponible); 
                     }
     
-                    $consumible['stock'] = $stockCompuesto; // Asignar el stock calculado al compuesto
-                    $consumible['componentes'] = $componentes; // Enviar también los componentes para mostrar en la vista
+                    $consumible['stock'] = $stockCompuesto;
+                    $consumible['componentes'] = $componentes;
                 }
             }
     

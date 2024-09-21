@@ -49,17 +49,23 @@ class ComprasController extends BaseController {
 
     public function createCompra() {
         $action = $_POST['action'] ?? '';
+    
         if ($action === 'normal') {
             $descripcion = $_POST['descripcion'] ?? '';
-            $cantidad = $_POST['cantidad'] ?? 0;
-            $costo_unitario = $_POST['costo_unitario'] ?? 0;
+            $cantidad = (int) $_POST['cantidad'] ?? 0;  
+            $costo_unitario = (float) $_POST['costo_unitario'] ?? 0;  
             $fecha = $_POST['fecha'] ?? date('Y-m-d');
             $proveedor = $_POST['proveedor'] ?? '';
             $metodo_pago = $_POST['metodo_pago'] ?? '';
             $observacion = $_POST['observacion'] ?? '';
-
-            $result = $this->model->registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $fecha, $proveedor, $metodo_pago, $observacion);
+            $total = $cantidad * $costo_unitario;
+    
+            $result = $this->model->registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $total, $fecha, $proveedor, $metodo_pago, $observacion);
+    
             echo json_encode(['success' => $result]);
+
+    
+    
         } elseif ($action === 'consumible') {
             $productos = json_decode($_POST['productosSeleccionados'], true);
             $proveedor = $_POST['proveedor'] ?? '';
@@ -80,7 +86,7 @@ class ComprasController extends BaseController {
         if ($categoriaId) {
             $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
             echo json_encode(array_filter($consumibles, function($consumible) {
-                return $consumible['stock'] !== null; // Filtrar consumibles con stock null
+                return $consumible['stock'] !== null; 
             }));
         } else {
             echo json_encode([]);

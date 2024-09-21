@@ -30,14 +30,12 @@ class Arsenal extends BaseModel{
             $ventaId = $this->db->lastInsertId();
     
             foreach ($productos as $producto) {
-                // Verificar si es un consumible compuesto
                 $query = "SELECT es_compuesto FROM consumibles WHERE id = ?";
                 $stmt = $this->db->prepare($query);
                 $stmt->execute([$producto['id']]);
                 $esCompuesto = $stmt->fetchColumn();
     
                 if ($esCompuesto) {
-                    // Si es compuesto, obtener los componentes
                     $query = "SELECT id_componente, cantidad FROM consumible_componentes WHERE id_consumible = ?";
                     $stmt = $this->db->prepare($query);
                     $stmt->execute([$producto['id']]);
@@ -45,9 +43,8 @@ class Arsenal extends BaseModel{
     
                     foreach ($componentes as $componente) {
                         $componenteId = $componente['id_componente'];
-                        $cantidadComponente = $componente['cantidad'] * $producto['cantidad']; // Cantidad necesaria del componente
+                        $cantidadComponente = $componente['cantidad'] * $producto['cantidad']; 
     
-                        // Verificar stock del componente
                         $query = "SELECT stock FROM consumibles WHERE id = ?";
                         $stmt = $this->db->prepare($query);
                         $stmt->execute([$componenteId]);
@@ -57,14 +54,12 @@ class Arsenal extends BaseModel{
                             throw new Exception("No hay suficiente stock para el componente ID " . $componenteId);
                         }
     
-                        // Descontar stock del componente
                         $nuevoStockComponente = $stockActualComponente - $cantidadComponente;
                         $query = "UPDATE consumibles SET stock = ? WHERE id = ?";
                         $stmt = $this->db->prepare($query);
                         $stmt->execute([$nuevoStockComponente, $componenteId]);
                     }
                 } else {
-                    // Si es un consumible simple, restar directamente el stock
                     $query = "SELECT stock FROM consumibles WHERE id = ?";
                     $stmt = $this->db->prepare($query);
                     $stmt->execute([$producto['id']]);
@@ -79,8 +74,7 @@ class Arsenal extends BaseModel{
                     $stmt = $this->db->prepare($query);
                     $stmt->execute([$nuevoStock, $producto['id']]);
                 }
-    
-                // Registrar los detalles de la venta
+                
                 $query = "INSERT INTO ventas_detalles (venta_id, consumible_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
                 $stmt = $this->db->prepare($query);
                 $stmt->execute([$ventaId, $producto['id'], $producto['cantidad'], $producto['precio']]);
@@ -340,7 +334,6 @@ class Arsenal extends BaseModel{
             return false;
         }
     }
-    // Insertar componente en la tabla intermedia consumible_componentes
 
 
     public function createBien($descripcion_bien, $nombre_proveedor, $modelo, $serie_codigo, $marca, $estado, $dimensiones, $color, $tipo_material, $estado_fisico_actual, $cantidad, $coste, $observacion)
@@ -420,10 +413,8 @@ class Arsenal extends BaseModel{
     }
     public function updateCategoriaForConsumible($consumibleId, $categoriaId)
     {
-        // Remove existing category for the consumible
         $this->db->prepare("DELETE FROM consumibles_categorias WHERE consumible_id = ?")->execute([$consumibleId]);
 
-        // Insert the new category
         if ($categoriaId) {
             $query = "INSERT INTO consumibles_categorias (consumible_id, categoria_id) VALUES (?, ?)";
             $stmt = $this->db->prepare($query);

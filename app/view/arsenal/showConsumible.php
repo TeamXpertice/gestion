@@ -126,7 +126,6 @@
 
     <script>
         $(document).ready(function() {
-            // Aplicar DataTables solo a la tabla de consumibles
             $('.table:not(.table-categorias)').DataTable({
                 language: {
                     url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
@@ -156,7 +155,6 @@
                 ]
             });
 
-            // Sin DataTables para la tabla de categorías
             $('#addCategoriaBtn').on('click', function() {
                 const nuevaCategoria = $('#nuevaCategoria').val();
 
