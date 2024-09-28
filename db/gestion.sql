@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-09-2024 a las 19:24:25
+-- Tiempo de generación: 28-09-2024 a las 20:39:23
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -95,19 +95,17 @@ CREATE TABLE `clientes` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `compras`
+-- Estructura de tabla para la tabla `compras_consumibles`
 --
 
-CREATE TABLE `compras` (
+CREATE TABLE `compras_consumibles` (
   `id` int(11) NOT NULL,
-  `descripcion_compra` varchar(255) NOT NULL,
+  `consumible_id` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL,
   `costo_unitario` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
-  `fecha_compra` date DEFAULT curdate(),
-  `proveedor` varchar(255) DEFAULT 'Sin Registro',
-  `metodo_pago` enum('Efectivo','Visa','Yape','Plin') DEFAULT 'Efectivo',
-  `observacion` text DEFAULT NULL
+  `fecha_ingreso` date NOT NULL DEFAULT curdate(),
+  `fecha_vencimiento` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -122,11 +120,10 @@ CREATE TABLE `compras_normales` (
   `cantidad` int(11) NOT NULL,
   `costo_unitario` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
-  `fecha_compra` date NOT NULL,
+  `fecha` date NOT NULL DEFAULT curdate(),
   `proveedor` varchar(255) DEFAULT NULL,
-  `metodo_pago` enum('Efectivo','Visa','Yape','Plin') NOT NULL,
-  `observacion` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `metodo_pago` varchar(255) NOT NULL,
+  `observacion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -182,10 +179,13 @@ CREATE TABLE `consumible_componentes` (
 
 CREATE TABLE `lotes` (
   `id` int(11) NOT NULL,
-  `consumible_id` int(11) NOT NULL,
+  `compras_consumibles_id` int(11) NOT NULL,
+  `lote` varchar(255) NOT NULL,
   `cantidad` int(11) NOT NULL,
-  `fecha_vencimiento` date NOT NULL,
-  `fecha_compra` date NOT NULL
+  `costo_unitario` decimal(10,2) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `fecha_ingreso` date NOT NULL,
+  `fecha_vencimiento` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -238,10 +238,11 @@ ALTER TABLE `categorias`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `compras`
+-- Indices de la tabla `compras_consumibles`
 --
-ALTER TABLE `compras`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `compras_consumibles`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `consumible_id` (`consumible_id`);
 
 --
 -- Indices de la tabla `compras_normales`
@@ -275,7 +276,7 @@ ALTER TABLE `consumible_componentes`
 --
 ALTER TABLE `lotes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `consumible_id` (`consumible_id`);
+  ADD KEY `compras_consumibles_id` (`compras_consumibles_id`);
 
 --
 -- Indices de la tabla `ventas`
@@ -300,9 +301,9 @@ ALTER TABLE `categorias`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `compras`
+-- AUTO_INCREMENT de la tabla `compras_consumibles`
 --
-ALTER TABLE `compras`
+ALTER TABLE `compras_consumibles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -346,6 +347,12 @@ ALTER TABLE `ventas_detalles`
 --
 
 --
+-- Filtros para la tabla `compras_consumibles`
+--
+ALTER TABLE `compras_consumibles`
+  ADD CONSTRAINT `compras_consumibles_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `consumibles_categorias`
 --
 ALTER TABLE `consumibles_categorias`
@@ -363,7 +370,7 @@ ALTER TABLE `consumible_componentes`
 -- Filtros para la tabla `lotes`
 --
 ALTER TABLE `lotes`
-  ADD CONSTRAINT `lotes_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`);
+  ADD CONSTRAINT `lotes_ibfk_1` FOREIGN KEY (`compras_consumibles_id`) REFERENCES `compras_consumibles` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
