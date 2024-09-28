@@ -8,9 +8,10 @@ class ComprasController extends BaseController {
     public function __construct() {
         $this->model = new Compras();
     }
+
+    // Mostrar registros de compras
     public function showRegistroCompras() {
         $nombre = $this->checkLogin();
-        date_default_timezone_set('America/Lima');
         $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
         $compras = $this->model->getComprasByDate($date);
         $totalPorMetodo = $this->model->getTotalPorMetodoPago($date);
@@ -21,6 +22,8 @@ class ComprasController extends BaseController {
             'totalPorMetodo' => $totalPorMetodo
         ]);
     }
+
+    // Mostrar formulario de compras
     public function showCompras() {
         $nombre = $this->checkLogin();
         $categorias = $this->model->getAllCategorias();
@@ -30,71 +33,65 @@ class ComprasController extends BaseController {
         ]);
     }
 
-    public function registrarCompraConsumibles($productos, $proveedor, $metodo_pago) {
-        foreach ($productos as $producto) {
-            $consumible_id = $producto['id'] ?? null;
-            $cantidad = $producto['cantidad'] ?? null;
-            $costo_unitario = $producto['coste'] ?? null;
-            $observacion = $producto['observacion'] ?? null;
-
-            if ($consumible_id && $cantidad && $costo_unitario) {
-                $this->model->reponerStock($consumible_id, $cantidad);
-                $this->model->registrarCompraConsumible($consumible_id, $cantidad, $costo_unitario, date('Y-m-d'), $observacion, $proveedor, $metodo_pago);
-            } else {
-                return false;
-            }
-        }
-        return true;
+    // Crear compra normal
+    public function createCompraNormal() {
+        $descripcion = $_POST['descripcion_compra'];
+        $cantidad = $_POST['cantidad'];
+        $costo_unitario = $_POST['costo_unitario'];
+        $total = $_POST['total'];
+        $fecha = $_POST['fecha'];
+        $proveedor = $_POST['proveedor'];
+        $metodo_pago = $_POST['metodo_pago'];
+        $observacion = $_POST['observacion'];
+    
+        $this->model->createCompraNormal($descripcion, $cantidad, $costo_unitario, $total, $fecha, $proveedor, $metodo_pago, $observacion);
+        echo json_encode(['success' => true]);
     }
 
-    public function createCompra() {
-        $action = $_POST['action'] ?? '';
+    // Crear compra de consumibles y sus lotes
+    public function createCompraConsumible() {
+        $productosSeleccionados = json_decode($_POST['productosSeleccionados'], true); // Productos enviados desde la vista
+        $proveedor = $_POST['proveedor'];
+        $metodo_pago = $_POST['metodo_pago'];
     
-        if ($action === 'normal') {
-            $descripcion = $_POST['descripcion'] ?? '';
-            $cantidad = (int) $_POST['cantidad'] ?? 0;  
-            $costo_unitario = (float) $_POST['costo_unitario'] ?? 0;  
-            $fecha = $_POST['fecha'] ?? date('Y-m-d');
-            $proveedor = $_POST['proveedor'] ?? '';
-            $metodo_pago = $_POST['metodo_pago'] ?? '';
-            $observacion = $_POST['observacion'] ?? '';
+        foreach ($productosSeleccionados as $producto) {
+            $consumible_id = $producto['id'];
+            $cantidad = $producto['cantidad'];
+            $costo_unitario = $producto['costo'];
+            $precio_unitario = $producto['precio'];
             $total = $cantidad * $costo_unitario;
+            $fecha_ingreso = date('Y-m-d');
+            $fecha_vencimiento = $producto['fecha_vencimiento'];
+            $lote = uniqid(); // Generar un identificador de lote único
     
-            $result = $this->model->registrarCompraNormal($descripcion, $cantidad, $costo_unitario, $total, $fecha, $proveedor, $metodo_pago, $observacion);
+            // Insertar en compras_consumibles y obtener el ID
+            $compras_consumibles_id = $this->model->createCompraConsumible($consumible_id, $cantidad, $costo_unitario, $total, $fecha_ingreso, $fecha_vencimiento);
     
-            echo json_encode(['success' => $result]);
-
+            // Insertar en lotes
+            $this->model->createLote($compras_consumibles_id, $lote, $cantidad, $costo_unitario, $precio_unitario, $fecha_ingreso, $fecha_vencimiento);
     
-    
-        } elseif ($action === 'consumible') {
-            $productos = json_decode($_POST['productosSeleccionados'], true);
-            $proveedor = $_POST['proveedor'] ?? '';
-            $metodo_pago = $_POST['metodo_pago'] ?? '';
-
-            if ($productos && $this->registrarCompraConsumibles($productos, $proveedor, $metodo_pago)) {
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false]);
-            }
-        } else {
-            echo json_encode(['success' => false]);
+            // Actualizar el stock del consumible
+            $this->model->updateStockConsumible($consumible_id, $cantidad);
         }
+    
+        echo json_encode(['success' => true]);
     }
 
+    // Obtener consumibles por categoría
     public function getConsumiblesPorCategoria() {
         $categoriaId = $_GET['categoria_id'] ?? null;
         if ($categoriaId) {
             $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
-            echo json_encode(array_filter($consumibles, function($consumible) {
-                return $consumible['stock'] !== null; 
-            }));
+            echo json_encode($consumibles);  // Elimina el filtro del stock
         } else {
             echo json_encode([]);
         }
         exit;
     }
+    
 }
 
+// Determinar la acción a ejecutar
 $action = $_GET['action'] ?? 'showCompras';
 $controller = new ComprasController();
 if (method_exists($controller, $action)) {

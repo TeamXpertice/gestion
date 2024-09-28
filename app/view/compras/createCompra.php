@@ -65,14 +65,15 @@
         <h2>Registrar Nueva Compra</h2>
 
         <div class="mb-4">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#createCompraModal">Registrar Nueva Compra Comun</button>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#createCompraModal">Registrar Nueva Compra Común</button>
         </div>
 
+        <!-- Modal para Compra Normal -->
         <div class="modal fade" id="createCompraModal" tabindex="-1" aria-labelledby="createCompraModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createCompraModalLabel">Registrar Nueva Compra</h5>
+                        <h5 class="modal-title" id="createCompraModalLabel">Registrar Nueva Compra Común</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -89,11 +90,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="costo_unitario">Costo Unitario</label>
-                                <input type="text" class="form-control" id="costo_unitario" name="costo_unitario" required>
+                                <input type="number" step="0.01" class="form-control" id="costo_unitario" name="costo_unitario" required>
                             </div>
                             <div class="form-group">
                                 <label for="total">Total</label>
-                                <input type="number" class="form-control" id="total" name="total" required disabled>
+                                <input type="number" step="0.01" class="form-control" id="total" name="total" required disabled>
                             </div>
                             <div class="form-group">
                                 <label for="fecha">Fecha de Compra</label>
@@ -123,6 +124,7 @@
             </div>
         </div>
 
+        <!-- Interfaz de Categorías y Previsualización -->
         <div class="row">
             <div class="col-md-6">
                 <h3>Tipos de Material</h3>
@@ -173,59 +175,177 @@
                     <button type="submit" class="btn btn-primary">Registrar Compra</button>
                 </form>
             </div>
+
+
+            
         </div>
     </div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/gestion/app/view/templates/footer.php'; ?>
 
+    <!-- Scripts de jQuery y Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <!-- Script Personalizado -->
     <script>
+        let productosSeleccionados = [];
 
-function calcularCostoTotal() {
-    const costoUnitario = parseFloat(document.getElementById('costo_unitario').value) || 0; // Costo unitario
-    const cantidad = parseFloat(document.getElementById('cantidad').value) || 0; // Cantidad
-    const total = document.getElementById('total'); // campo de total
+        // Función para agregar producto a la previsualización
+        function agregarProducto(id, nombre, costo, precio, fecha_vencimiento, stock) {
+            let productoExistente = productosSeleccionados.find(producto => producto.id === id);
 
-    if (costoUnitario > 0 && cantidad > 0) {
-        const costoTotal = costoUnitario * cantidad;
+            if (productoExistente) {
+                if (productoExistente.cantidad < stock) {
+                    productoExistente.cantidad++;
+                } else {
+                    alert('No hay suficiente stock disponible.');
+                    return;
+                }
+            } else {
+                productosSeleccionados.push({
+                    id: id,
+                    nombre: nombre,
+                    cantidad: 1,
+                    costo: parseFloat(costo),
+                    precio: parseFloat(precio),
+                    fecha_vencimiento: fecha_vencimiento,
+                    stock: stock
+                });
+            }
 
-        total.value = costoTotal.toFixed(2); 
-    } else {
-        total.value = ''; 
-    }
-}
+            actualizarPrevisualizacion();
+        }
 
-// Asegúrate de que esta función se llame cuando los valores cambien
-document.getElementById('cantidad').addEventListener('input', calcularCostoTotal);
-document.getElementById('costo_unitario').addEventListener('input', calcularCostoTotal);
+        // Función para actualizar la previsualización de la compra con campos editables
+        function actualizarPrevisualizacion() {
+            let html = '';
+            let total = 0;
 
-        var productosSeleccionados = [];
+            if (productosSeleccionados.length > 0) {
+                html += '<ul class="list-group">';
+                productosSeleccionados.forEach(function(producto, index) {
+                    let subtotal = producto.cantidad * producto.costo;
+                    total += subtotal;
+                    html += '<li class="list-group-item">' +
+                        '<strong>' + producto.nombre + '</strong><br>' +
+                        'Cantidad: <input type="number" value="' + producto.cantidad + '" min="1" max="' + producto.stock + '" onchange="actualizarCantidad(' + index + ', this.value)" style="width: 60px;"><br>' +
+                        'Subtotal: <input type="text" value="' + subtotal.toFixed(2) + '" onchange="actualizarSubtotal(' + index + ', this.value)" style="width: 100px;"> S/.' + '<br>' +
+                        'Precio de Venta: <input type="text" value="' + producto.precio.toFixed(2) + '" onchange="actualizarPrecio(' + index + ', this.value)" style="width: 100px;"> S/.' + '<br>' +
+                        'Fecha de Compra: <input type="date" value="' + new Date().toISOString().split('T')[0] + '" onchange="actualizarFechaCompra(' + index + ', this.value)" style="width: 150px;"><br>' +
+                        'Fecha de Vencimiento: <input type="date" value="' + producto.fecha_vencimiento + '" onchange="actualizarFechaVencimiento(' + index + ', this.value)" style="width: 150px;"><br>' +
+                        '<button class="btn btn-sm btn-secondary mt-2" onclick="incrementarCantidad(' + index + ')">+</button> ' +
+                        '<button class="btn btn-sm btn-secondary mt-2" onclick="decrementarCantidad(' + index + ')">-</button>' +
+                        '</li>';
+                });
+                html += '</ul>';
+                $('#compraPreview').html(html);
+                $('#totalCompra').html('<h4>Total: S/.' + total.toFixed(2) + '</h4>');
+                $('#productosSeleccionados').val(JSON.stringify(productosSeleccionados));
+            } else {
+                $('#compraPreview').html('<p>No hay productos seleccionados.</p>');
+                $('#totalCompra').html('');
+                $('#productosSeleccionados').val('');
+            }
+        }
 
+        // Funciones para actualizar cada campo editable
+        function actualizarCantidad(index, nuevaCantidad) {
+            if (nuevaCantidad <= productosSeleccionados[index].stock) {
+                productosSeleccionados[index].cantidad = parseInt(nuevaCantidad);
+                actualizarPrevisualizacion();
+            } else {
+                alert('No hay suficiente stock disponible.');
+            }
+        }
+
+        function actualizarSubtotal(index, nuevoSubtotal) {
+            productosSeleccionados[index].costo = parseFloat(nuevoSubtotal) / productosSeleccionados[index].cantidad;
+            actualizarPrevisualizacion();
+        }
+
+        function actualizarPrecio(index, nuevoPrecio) {
+            productosSeleccionados[index].precio = parseFloat(nuevoPrecio);
+            actualizarPrevisualizacion();
+        }
+
+        function actualizarFechaCompra(index, nuevaFecha) {
+            productosSeleccionados[index].fecha_compra = nuevaFecha;
+        }
+
+        function actualizarFechaVencimiento(index, nuevaFecha) {
+            productosSeleccionados[index].fecha_vencimiento = nuevaFecha;
+        }
+
+        function incrementarCantidad(id) {
+            let producto = productosSeleccionados.find(p => p.id === id);
+            if (producto && producto.cantidad < producto.stock) {
+                producto.cantidad++;
+                actualizarPrevisualizacion();
+            } else {
+                alert('No hay suficiente stock disponible.');
+            }
+        }
+
+        function decrementarCantidad(id) {
+            let producto = productosSeleccionados.find(p => p.id === id);
+            if (producto) {
+                if (producto.cantidad > 1) {
+                    producto.cantidad--;
+                } else {
+                    productosSeleccionados = productosSeleccionados.filter(p => p.id !== id); // Eliminar producto si cantidad es 0
+                }
+                actualizarPrevisualizacion();
+            }
+        }
+
+
+        // Función para calcular el total en compra normal
+        function calcularCostoTotal() {
+            const costoUnitario = parseFloat(document.getElementById('costo_unitario').value) || 0;
+            const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+            const total = document.getElementById('total');
+
+            if (costoUnitario > 0 && cantidad > 0) {
+                const costoTotal = costoUnitario * cantidad;
+                total.value = costoTotal.toFixed(2);
+            } else {
+                total.value = '';
+            }
+        }
+
+        // Event listeners para actualizar el total
+        document.getElementById('cantidad').addEventListener('input', calcularCostoTotal);
+        document.getElementById('costo_unitario').addEventListener('input', calcularCostoTotal);
+
+        // Manejar el envío del formulario de compra normal
         $('#compraNormalForm').on('submit', function(e) {
             e.preventDefault();
 
+            // Habilitar el campo total antes de enviar
+            $('#total').prop('disabled', false);
+
             $.ajax({
-                url: '/gestion/app/controller/ComprasController.php?action=createCompra',
+                url: '/gestion/app/controller/ComprasController.php?action=createCompraNormal',
                 type: 'POST',
                 data: {
-                    action: 'normal',
                     descripcion_compra: $('#descripcion_compra').val(),
                     cantidad: $('#cantidad').val(),
                     costo_unitario: $('#costo_unitario').val(),
                     total: $('#total').val(),
-                    fecha_compra: $('#fecha_compra').val(),
+                    fecha: $('#fecha').val(),
                     proveedor: $('#proveedor').val(),
                     metodo_pago: $('#metodo_pago').val(),
                     observacion: $('#observacion').val()
                 },
                 success: function(response) {
                     try {
-                        var json = JSON.parse(response);
+                        let json = JSON.parse(response);
                         if (json.success) {
                             alert('Compra normal registrada exitosamente.');
                             $('#createCompraModal').modal('hide');
+                            $('#compraNormalForm')[0].reset();
+                            calcularCostoTotal();
                         } else {
                             alert('Error: ' + json.error);
                         }
@@ -239,6 +359,7 @@ document.getElementById('costo_unitario').addEventListener('input', calcularCost
             });
         });
 
+        // Manejar el envío del formulario de compra de consumibles
         $('#compraConsumiblesForm').on('submit', function(e) {
             e.preventDefault();
 
@@ -247,20 +368,30 @@ document.getElementById('costo_unitario').addEventListener('input', calcularCost
                 return;
             }
 
+            // Validar que cada producto tenga fecha_vencimiento
+            for (let producto of productosSeleccionados) {
+                if (!producto.fecha_vencimiento) {
+                    alert('Debes especificar la fecha de vencimiento para todos los productos.');
+                    return;
+                }
+            }
+
             $.ajax({
-                url: '/gestion/app/controller/ComprasController.php?action=createCompra',
+                url: '/gestion/app/controller/ComprasController.php?action=createCompraConsumible',
                 type: 'POST',
                 data: {
-                    action: 'consumible',
                     productosSeleccionados: JSON.stringify(productosSeleccionados),
                     proveedor: $('#proveedor').val(),
                     metodo_pago: $('#metodo_pago').val()
                 },
                 success: function(response) {
                     try {
-                        var json = JSON.parse(response);
+                        let json = JSON.parse(response);
                         if (json.success) {
                             alert('Compra de consumibles registrada exitosamente.');
+                            $('#compraConsumiblesForm')[0].reset();
+                            productosSeleccionados = [];
+                            actualizarPrevisualizacion();
                         } else {
                             alert('Error: ' + json.error);
                         }
@@ -274,6 +405,9 @@ document.getElementById('costo_unitario').addEventListener('input', calcularCost
             });
         });
 
+        
+
+        // Función para mostrar productos por categorias
         function mostrarConsumiblesPorCategoria(categoriaId) {
             $.ajax({
                 url: '/gestion/app/controller/ComprasController.php',
@@ -284,19 +418,35 @@ document.getElementById('costo_unitario').addEventListener('input', calcularCost
                 },
                 success: function(response) {
                     try {
-                        var consumibles = JSON.parse(response);
-                        var html = '';
+                        let consumibles = JSON.parse(response);
+                        let html = '';
                         if (consumibles.length > 0) {
                             html += '<ul class="list-group">';
                             consumibles.forEach(function(consumible) {
-                                if (consumible.stock !== null && consumible.stock > 0) { // Verificar stock
-                                    html += '<li class="list-group-item">' +
-                                        '<strong>' + consumible.nombre + '</strong><br>' +
-                                        'Stock: ' + consumible.stock + '<br>' +
-                                        'Costo: $' + consumible.coste + '<br>' +
-                                        '<button class="btn btn-sm btn-primary mt-2" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.coste + ', ' + consumible.stock + ')">Agregar</button>' +
-                                        '</li>';
+                                // Definir valores por defecto, pero sin mostrar N/A si es null
+                                const stock = consumible.stock !== null ? consumible.stock : 0;
+                                const coste = consumible.coste !== null ? 'S/.' + consumible.coste : ''; // No mostrar si es null
+                                const precio = consumible.precio !== null ? 'S/.' + consumible.precio : ''; // No mostrar si es null
+                                const fechaVencimiento = consumible.fecha_vencimiento ? consumible.fecha_vencimiento : 'Sin fecha';
+
+                                // Construir la visualización del producto
+                                html += '<li class="list-group-item">' +
+                                    '<strong>' + consumible.nombre + '</strong><br>' +
+                                    'Stock: ' + stock + '<br>';
+
+                                // Solo mostrar el coste si está definido
+                                if (coste) {
+                                    html += 'Costo Total: ' + coste + '<br>';
                                 }
+
+                                // Solo mostrar el precio si está definido
+                                if (precio) {
+                                    html += 'Precio de Venta: ' + precio + '<br>';
+                                }
+
+                                html += 'Fecha de Vencimiento: ' + fechaVencimiento + '<br>' +
+                                    '<button class="btn btn-sm btn-primary mt-2" onclick="agregarProducto(' + consumible.id + ', \'' + consumible.nombre + '\', ' + consumible.coste + ', ' + consumible.precio + ', \'' + consumible.fecha_vencimiento + '\', ' + stock + ')">Agregar</button>' +
+                                    '</li>';
                             });
                             html += '</ul>';
                         } else {
@@ -316,73 +466,12 @@ document.getElementById('costo_unitario').addEventListener('input', calcularCost
             });
         }
 
-        function agregarProducto(id, nombre, coste, stock) {
-            var productoExistente = productosSeleccionados.find(function(producto) {
-                return producto.id === id;
-            });
 
-            if (productoExistente) {
-                productoExistente.cantidad++;
-            } else {
-                productosSeleccionados.push({
-                    id: id,
-                    nombre: nombre,
-                    cantidad: 1,
-                    coste: coste,
-                    observacion: ''
-                });
-            }
+      
 
-            actualizarPrevisualizacion();
-        }
 
-        function actualizarPrevisualizacion() {
-            var html = '';
-            var total = 0;
 
-            if (productosSeleccionados.length > 0) {
-                html += '<ul class="list-group">';
-                productosSeleccionados.forEach(function(producto) {
-                    var subtotal = producto.cantidad * producto.coste;
-                    total += subtotal;
-                    html += '<li class="list-group-item">' +
-                        '<strong>' + producto.nombre + '</strong><br>' +
-                        'Cantidad: ' + producto.cantidad + '<br>' +
-                        'Subtotal: $' + subtotal.toFixed(2) + '<br>' +
-                        '<button class="btn btn-sm btn-secondary mt-2" onclick="incrementarCantidad(' + producto.id + ')">+</button> ' +
-                        '<button class="btn btn-sm btn-secondary mt-2" onclick="decrementarCantidad(' + producto.id + ')">-</button>' +
-                        '</li>';
-                });
-                html += '</ul>';
-                $('#compraPreview').html(html);
-                $('#totalCompra').html('<h4>Total: $' + total.toFixed(2) + '</h4>');
-                $('#productosSeleccionados').val(JSON.stringify(productosSeleccionados));
-            } else {
-                $('#compraPreview').html('<p>No hay productos seleccionados.</p>');
-                $('#totalCompra').html('');
-                $('#productosSeleccionados').val('');
-            }
-        }
 
-        function incrementarCantidad(id) {
-            var producto = productosSeleccionados.find(p => p.id === id);
-            if (producto) {
-                producto.cantidad++;
-                actualizarPrevisualizacion();
-            }
-        }
-
-        function decrementarCantidad(id) {
-            var producto = productosSeleccionados.find(p => p.id === id);
-            if (producto) {
-                if (producto.cantidad > 1) {
-                    producto.cantidad--;
-                } else {
-                    productosSeleccionados = productosSeleccionados.filter(p => p.id !== id);
-                }
-                actualizarPrevisualizacion();
-            }
-        }
     </script>
 </body>
 
