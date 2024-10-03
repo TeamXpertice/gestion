@@ -5,7 +5,7 @@ class Compras extends BaseModel {
 
     // Obtener compras por fecha
     public function getComprasByDate($date) {
-        $sql = "SELECT * FROM compras WHERE fecha_compra = :date ORDER BY fecha_compra DESC";
+        $sql = "SELECT * FROM compras_normales WHERE fecha = :date ORDER BY fecha DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':date', $date);
         $stmt->execute();
@@ -15,8 +15,8 @@ class Compras extends BaseModel {
     // Obtener total por método de pago
     public function getTotalPorMetodoPago($date) {
         $sql = "SELECT metodo_pago, SUM(total) as total_por_metodo
-                FROM compras
-                WHERE fecha_compra = :date
+                FROM compras_normales
+                WHERE fecha  = :date
                 GROUP BY metodo_pago";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':date', $date);
@@ -62,7 +62,7 @@ class Compras extends BaseModel {
             ':fecha_ingreso' => $fecha_ingreso,
             ':fecha_vencimiento' => $fecha_vencimiento
         ]);
-        return $this->db->lastInsertId(); // Devolver el ID para relacionarlo con lotes
+        return $this->db->lastInsertId(); 
     }
 
     // Crear lote

@@ -30,7 +30,7 @@ if (!empty($compras)) {
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Registro de Comprass</h1>
+    <h1 class="mb-4">Registro de Compras</h1>
     <div class="mb-4">
         <form action="/gestion/app/controller/ComprasController.php" method="get">
             <input type="hidden" name="action" value="showRegistroCompras">
@@ -56,7 +56,7 @@ if (!empty($compras)) {
                         <td><?php echo htmlspecialchars($compra['cantidad']); ?></td>
                         <td><?php echo htmlspecialchars($compra['costo_unitario']); ?></td>
                         <td><?php echo htmlspecialchars($compra['total']); ?></td>
-                        <td><?php echo htmlspecialchars($compra['fecha_compra']); ?></td>
+                        <td><?php echo htmlspecialchars($compra['fecha']); ?></td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
