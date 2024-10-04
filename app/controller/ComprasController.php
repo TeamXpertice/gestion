@@ -14,12 +14,10 @@ class ComprasController extends BaseController {
         $nombre = $this->checkLogin();
         $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
         $compras = $this->model->getComprasByDate($date);
-        $totalPorMetodo = $this->model->getTotalPorMetodoPago($date);
         $this->loadView('compras.comprasRegistradas', [
             'compras' => $compras,
             'selectedDate' => $date,
-            'nombre' => $nombre,
-            'totalPorMetodo' => $totalPorMetodo
+            'nombre' => $nombre
         ]);
     }
 

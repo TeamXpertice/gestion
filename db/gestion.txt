@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-09-2024 a las 20:39:23
+-- Tiempo de generación: 04-10-2024 a las 21:37:34
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -105,7 +105,8 @@ CREATE TABLE `compras_consumibles` (
   `costo_unitario` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
   `fecha_ingreso` date NOT NULL DEFAULT curdate(),
-  `fecha_vencimiento` date DEFAULT NULL
+  `fecha_vencimiento` date DEFAULT NULL,
+  `metodo_pago` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

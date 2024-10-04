@@ -41,7 +41,7 @@ if (!empty($compras)) {
         <table id="comprasTable" class="table table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
-                    <th>Descripción</th>
+                    <th>Nombre</th>
                     <th>Cantidad</th>
                     <th>Costo Unitario</th>
                     <th>Total</th>
@@ -52,7 +52,7 @@ if (!empty($compras)) {
                 <?php if (!empty($compras)): ?>
                     <?php foreach ($compras as $compra): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($compra['descripcion_compra']); ?></td>
+                        <td><?php echo htmlspecialchars($compra['nombre']); ?></td>
                         <td><?php echo htmlspecialchars($compra['cantidad']); ?></td>
                         <td><?php echo htmlspecialchars($compra['costo_unitario']); ?></td>
                         <td><?php echo htmlspecialchars($compra['total']); ?></td>

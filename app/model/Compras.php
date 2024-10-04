@@ -5,24 +5,38 @@ class Compras extends BaseModel {
 
     // Obtener compras por fecha
     public function getComprasByDate($date) {
-        $sql = "SELECT * FROM compras_normales WHERE fecha = :date ORDER BY fecha DESC";
+        $sql = "SELECT 
+                    cn.descripcion_compra AS nombre,
+                    cn.cantidad AS cantidad,
+                    cn.costo_unitario AS costo_unitario,
+                    cn.total AS total,
+                    cn.fecha AS fecha,
+                    cn.metodo_pago AS metodo_pago
+
+                FROM compras_normales cn
+                WHERE cn.fecha = :date
+
+                UNION ALL
+
+                SELECT 
+                    c.nombre AS nombre,
+                    cc.cantidad AS cantidad,
+                    cc.costo_unitario AS costo_unitario,
+                    cc.total AS total,
+                    cc.fecha_ingreso AS fecha,
+                    cc.metodo_pago AS metodo_pago
+            
+
+                FROM compras_consumibles cc
+                INNER JOIN consumibles c ON c.id = cc.consumible_id
+                WHERE cc.fecha_ingreso = :date";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':date', $date);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Obtener total por método de pago
-    public function getTotalPorMetodoPago($date) {
-        $sql = "SELECT metodo_pago, SUM(total) as total_por_metodo
-                FROM compras_normales
-                WHERE fecha  = :date
-                GROUP BY metodo_pago";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':date', $date);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+
 
     // Obtener todas las categorías
     public function getAllCategorias() {
