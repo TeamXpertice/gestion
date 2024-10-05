@@ -76,15 +76,14 @@ class ArsenalController extends BaseController
         ]);
     }
     ////////////////////////////////////////////////ALMACENES///////////////////////////////////////////////////
-    public function createConsumible() {
+    public function createConsumible()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre = $_POST['nombre'];
             $descripcion_consumible = $_POST['descripcion_consumible'];
             $marca = isset($_POST['marca']) && !empty($_POST['marca']) ? $_POST['marca'] : 'S/D';
             $unidad_medida = $_POST['unidad_medida'];
             $observacion = $_POST['observacion'];
-            $fecha_compra = $_POST['fecha_compra'];
-            $fecha_vencimiento = $_POST['fecha_vencimiento'];
             $precio = $_POST['precio'];
             $es_compuesto = isset($_POST['consumible_multiple']) ? 1 : 0;
 
@@ -95,37 +94,48 @@ class ArsenalController extends BaseController
                     $costeComponente = $datosComponente['precio'] * $cantidad;
                     $coste += $costeComponente;
                 }
-                $stock = NULL;
+                $stock = NULL; // Los compuestos no tienen stock propio
             } else {
                 $coste = $_POST['coste'];
                 $stock = $_POST['stock'];
             }
-    
+
+            // Crear el consumible
             $consumibleId = $this->model->createConsumible(
                 $nombre,
                 $descripcion_consumible,
                 $marca,
                 $unidad_medida,
                 $observacion,
-                $fecha_compra,
-                $fecha_vencimiento,
+                null, // no se utiliza fecha_compra
+                null, // no se utiliza fecha_vencimiento
                 $precio,
-                $stock, 
+                $stock,
                 $coste,
                 $es_compuesto
             );
-    
+
             if ($consumibleId) {
+                // Asignar categorías
                 if (isset($_POST['categorias'])) {
                     $this->model->assignCategoriasToConsumible($consumibleId, $_POST['categorias']);
                 }
-    
+
+                // Añadir componentes si es compuesto
                 if ($es_compuesto && isset($_POST['componentes'])) {
                     foreach ($_POST['componentes'] as $componenteId => $datosComponente) {
                         $cantidad = $datosComponente['cantidad'];
                         $this->model->addComponenteToConsumible($consumibleId, $componenteId, $cantidad);
                     }
+                } else {
+                    // Crear el lote para los consumibles simples
+                    // Utiliza las fechas de compra y vencimiento aquí
+                    $fecha_compra = $_POST['fecha_compra']; // Obtener la fecha de compra del formulario
+                    $fecha_vencimiento = $_POST['fecha_vencimiento']; // Obtener la fecha de vencimiento del formulario
+
+                    $this->model->createLote($consumibleId, $stock, $coste / $stock, $precio, $fecha_compra, $fecha_vencimiento);
                 }
+
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
                 exit;
             } else {
@@ -140,7 +150,10 @@ class ArsenalController extends BaseController
             ]);
         }
     }
-    
+
+
+
+
     public function editConsumible()
     {
         $id = $_GET['id'];
@@ -188,17 +201,17 @@ class ArsenalController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $productosSeleccionados = isset($_POST['productosSeleccionados']) ? json_decode($_POST['productosSeleccionados'], true) : [];
             $metodoPago = isset($_POST['metodo_pago']) ? $_POST['metodo_pago'] : '';
-    
+
             if (empty($productosSeleccionados)) {
                 echo json_encode(['error' => 'No se han seleccionado productos.']);
                 exit;
             }
-            
+
             $totalVenta = 0;
             foreach ($productosSeleccionados as $producto) {
                 $totalVenta += $producto['cantidad'] * $producto['precio'];
             }
-    
+
             try {
                 $this->model->registrarVenta($productosSeleccionados, $totalVenta, $metodoPago);
                 echo json_encode(['success' => 'Venta registrada exitosamente.']);
@@ -292,16 +305,17 @@ class ArsenalController extends BaseController
         }
     }
     ////////////////////////////////////////////////GET///////////////////////////////////////////////////
-    public function getConsumiblesByCategoria() {
+    public function getConsumiblesByCategoria()
+    {
         header('Content-Type: application/json');
         try {
             if (!isset($_GET['id'])) {
                 throw new Exception('ID de categoría no especificado.');
             }
-    
+
             $categoriaId = $_GET['id'];
             $consumibles = $this->model->getConsumiblesByCategoria($categoriaId);
-    
+
             echo json_encode(['consumibles' => $consumibles]);
         } catch (Exception $e) {
             http_response_code(500);
@@ -313,25 +327,25 @@ class ArsenalController extends BaseController
         $categoriaId = $_GET['categoria_id'];
         if ($categoriaId) {
             $consumibles = $this->model->getConsumiblesPorCategoria($categoriaId);
-            
+
             foreach ($consumibles as &$consumible) {
                 $esCompuesto = isset($consumible['es_compuesto']) ? $consumible['es_compuesto'] : 0;
-    
+
                 if ($esCompuesto == 1) {
                     $componentes = $this->model->getComponentesByConsumible($consumible['id']);
-                    
-                    $stockCompuesto = PHP_INT_MAX; 
-    
+
+                    $stockCompuesto = PHP_INT_MAX;
+
                     foreach ($componentes as $componente) {
                         $stockDisponible = floor($componente['stock'] / $componente['cantidad']);
-                        $stockCompuesto = min($stockCompuesto, $stockDisponible); 
+                        $stockCompuesto = min($stockCompuesto, $stockDisponible);
                     }
-    
+
                     $consumible['stock'] = $stockCompuesto;
                     $consumible['componentes'] = $componentes;
                 }
             }
-    
+
             echo json_encode($consumibles);
         } else {
             echo json_encode([]);
@@ -362,8 +376,6 @@ class ArsenalController extends BaseController
         $this->model->deleteBien($id);
         header('Location: /gestion/app/controller/ArsenalController.php?action=showBien');
     }
-
-
 }
 $action = $_GET['action'] ?? 'showArsenal';
 $controller = new ArsenalController();

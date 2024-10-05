@@ -35,7 +35,7 @@
                         <td><?php echo htmlspecialchars($consumible['nombre']); ?></td>
                         <td><?php echo htmlspecialchars($consumible['descripcion_consumible']); ?></td>
                         <td><?php echo htmlspecialchars($consumible['fecha_vencimiento']); ?></td>
-                        <td><?php echo htmlspecialchars($consumible['precio']); ?></td>
+                        <td><?php echo htmlspecialchars($consumible['precio_unitario']); ?></td>
                         <td>
                             <a href="/gestion/app/controller/ArsenalController.php?action=editConsumible&id=<?php echo $consumible['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
                             <a href="/gestion/app/controller/ArsenalController.php?action=deleteConsumible&id=<?php echo $consumible['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este consumible?');">Eliminar</a>

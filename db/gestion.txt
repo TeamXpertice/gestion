@@ -1,379 +1,132 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 04-10-2024 a las 21:37:34
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS gestion;
+USE gestion;
+
+-- Crear la tabla administradores
+CREATE TABLE administradores (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    nombres VARCHAR(255) NOT NULL,
+    apellidos VARCHAR(255) NOT NULL,
+    correo VARCHAR(255) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    dni VARCHAR(20) NOT NULL,
+    celular VARCHAR(20) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    direccion TEXT NOT NULL,
+    ocupacion VARCHAR(255) NOT NULL
+);
+
+-- Crear la tabla categorias
+CREATE TABLE categorias (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
+
+-- Crear la tabla consumibles
+CREATE TABLE consumibles (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion_consumible TEXT,
+    unidad_medida VARCHAR(255) NOT NULL,
+    categoria_id INT(11),W
+    precio_sugerido DECIMAL(10,2),
+    es_compuesto TINYINT(1) DEFAULT 0,
+    marca VARCHAR(255),
+    observacion TEXT,
+    CONSTRAINT fk_categoria FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+);
+
+-- Crear la tabla consumibles_categorias
+CREATE TABLE consumibles_categorias (
+    consumible_id INT(11) NOT NULL,
+    categoria_id INT(11) NOT NULL,
+    PRIMARY KEY (consumible_id, categoria_id),
+    CONSTRAINT fk_consumible_categoria FOREIGN KEY (consumible_id) REFERENCES consumibles(id),
+    CONSTRAINT fk_categoria_consumible FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+);
+
+-- Crear la tabla compras_consumibles
+CREATE TABLE compras_consumibles (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    consumible_id INT(11) NOT NULL,
+    cantidad INT(11) NOT NULL,
+    costo_unitario DECIMAL(10,2) NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    fecha_ingreso DATE NOT NULL,
+    fecha_vencimiento DATE NOT NULL,
+    metodo_pago VARCHAR(40),
+    CONSTRAINT fk_consumible FOREIGN KEY (consumible_id) REFERENCES consumibles(id)
+);
+
+-- Crear la tabla lotes
+CREATE TABLE lotes (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    compras_consumibles_id INT(11) NOT NULL,
+    lote VARCHAR(255) NOT NULL,
+    cantidad INT(11) NOT NULL,
+    costo_unitario DECIMAL(10,2) NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    fecha_ingreso DATE NOT NULL,
+    fecha_vencimiento DATE NOT NULL,
+    CONSTRAINT fk_compras_consumibles FOREIGN KEY (compras_consumibles_id) REFERENCES compras_consumibles(id)
+);
+
+-- Crear la tabla consumible_componentes
+CREATE TABLE consumible_componentes (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    id_consumible INT(11) NOT NULL,
+    id_componente INT(11) NOT NULL,
+    cantidad DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_consumible_compuesto FOREIGN KEY (id_consumible) REFERENCES consumibles(id),
+    CONSTRAINT fk_componente_simple FOREIGN KEY (id_componente) REFERENCES consumibles(id)
+);
+
+-- Crear la tabla compras_normales
+CREATE TABLE compras_normales (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    descripcion_compra VARCHAR(255) NOT NULL,
+    cantidad INT(11) NOT NULL,
+    costo_unitario DECIMAL(10,2) NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    fecha DATE NOT NULL DEFAULT CURDATE(),
+    proveedor VARCHAR(255),
+    metodo_pago VARCHAR(255) NOT NULL,
+    observacion TEXT
+);
+
+-- Crear la tabla ventas
+CREATE TABLE ventas (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    total DECIMAL(10,2) NOT NULL,
+    metodo_pago ENUM('Efectivo','Visa','Yape','Plin') NOT NULL,
+    fecha DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
+);
+
+-- Crear la tabla ventas_detalles
+CREATE TABLE ventas_detalles (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    venta_id INT(11) NOT NULL,
+    consumible_id INT(11) NOT NULL,
+    cantidad INT(11) NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_venta FOREIGN KEY (venta_id) REFERENCES ventas(id),
+    CONSTRAINT fk_consumible_venta FOREIGN KEY (consumible_id) REFERENCES consumibles(id)
+);
+
+-- Tabla de clientes (como referencia)
+CREATE TABLE clientes (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    descipcion TEXT
+);
+
+-- Tabla de renta (como referencia)
+CREATE TABLE renta (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    descipcion TEXT
+);
+
+-- Ejemplo de inserciones (puedes eliminarlas si no las necesitas)
+INSERT INTO administradores (nombres, apellidos, correo, contrasena, dni, celular, fecha_nacimiento, direccion, ocupacion)
+VALUES ('Administrador Principal', 'Administrador Principal', 'admin@gmail.com', 'admin', '99999999', '666666666', '2000-01-01', 'No hay descripción', 'Administrador Principal');
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `gestion`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `administradores`
---
-
-CREATE TABLE `administradores` (
-  `id` int(11) NOT NULL,
-  `nombres` varchar(255) NOT NULL,
-  `apellidos` varchar(255) NOT NULL,
-  `correo` varchar(255) NOT NULL,
-  `contrasena` varchar(255) NOT NULL,
-  `dni` varchar(20) NOT NULL,
-  `celular` varchar(20) NOT NULL,
-  `fecha_nacimiento` date NOT NULL,
-  `direccion` text NOT NULL,
-  `ocupacion` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `administradores`
---
-
-INSERT INTO `administradores` (`id`, `nombres`, `apellidos`, `correo`, `contrasena`, `dni`, `celular`, `fecha_nacimiento`, `direccion`, `ocupacion`) VALUES
-(1, 'Administrador Principal', 'Administrador Principal', 'admin@gmail.com', 'admin', '99999999', '666666666', '2000-01-01', 'No hay descripción', 'Administrador Principal');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `bienes`
---
-
-CREATE TABLE `bienes` (
-  `id` int(11) NOT NULL,
-  `descripcion_bien` varchar(255) NOT NULL,
-  `nombre_proveedor` varchar(255) DEFAULT 'Sin Registro',
-  `modelo` varchar(255) DEFAULT NULL,
-  `serie_codigo` varchar(255) DEFAULT 'Sin Registro',
-  `marca` varchar(255) DEFAULT NULL,
-  `estado` varchar(255) NOT NULL,
-  `dimensiones` varchar(255) NOT NULL,
-  `color` varchar(255) NOT NULL,
-  `tipo_material` varchar(255) NOT NULL,
-  `estado_fisico_actual` varchar(255) NOT NULL,
-  `cantidad` int(11) DEFAULT NULL,
-  `coste` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `observacion` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `categorias`
---
-
-CREATE TABLE `categorias` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `clientes`
---
-
-CREATE TABLE `clientes` (
-  `id` int(11) NOT NULL,
-  `descipcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `compras_consumibles`
---
-
-CREATE TABLE `compras_consumibles` (
-  `id` int(11) NOT NULL,
-  `consumible_id` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL,
-  `costo_unitario` decimal(10,2) NOT NULL,
-  `total` decimal(10,2) NOT NULL,
-  `fecha_ingreso` date NOT NULL DEFAULT curdate(),
-  `fecha_vencimiento` date DEFAULT NULL,
-  `metodo_pago` varchar(40) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `compras_normales`
---
-
-CREATE TABLE `compras_normales` (
-  `id` int(11) NOT NULL,
-  `descripcion_compra` varchar(255) NOT NULL,
-  `cantidad` int(11) NOT NULL,
-  `costo_unitario` decimal(10,2) NOT NULL,
-  `total` decimal(10,2) NOT NULL,
-  `fecha` date NOT NULL DEFAULT curdate(),
-  `proveedor` varchar(255) DEFAULT NULL,
-  `metodo_pago` varchar(255) NOT NULL,
-  `observacion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `consumibles`
---
-
-CREATE TABLE `consumibles` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(255) DEFAULT NULL,
-  `descripcion_consumible` text DEFAULT NULL,
-  `stock` int(11) DEFAULT NULL,
-  `unidad_medida` varchar(255) DEFAULT NULL,
-  `marca` varchar(255) DEFAULT NULL,
-  `observacion` text DEFAULT NULL,
-  `fecha_compra` date DEFAULT curdate(),
-  `fecha_vencimiento` date DEFAULT NULL,
-  `coste` decimal(10,2) DEFAULT NULL,
-  `precio` decimal(10,2) DEFAULT NULL,
-  `es_compuesto` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `consumibles_categorias`
---
-
-CREATE TABLE `consumibles_categorias` (
-  `consumible_id` int(11) NOT NULL,
-  `categoria_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `consumible_componentes`
---
-
-CREATE TABLE `consumible_componentes` (
-  `id` int(11) NOT NULL,
-  `id_consumible` int(11) NOT NULL,
-  `id_componente` int(11) NOT NULL,
-  `cantidad` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `lotes`
---
-
-CREATE TABLE `lotes` (
-  `id` int(11) NOT NULL,
-  `compras_consumibles_id` int(11) NOT NULL,
-  `lote` varchar(255) NOT NULL,
-  `cantidad` int(11) NOT NULL,
-  `costo_unitario` decimal(10,2) NOT NULL,
-  `precio_unitario` decimal(10,2) NOT NULL,
-  `fecha_ingreso` date NOT NULL,
-  `fecha_vencimiento` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `renta`
---
-
-CREATE TABLE `renta` (
-  `id` int(11) NOT NULL,
-  `descipcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `ventas`
---
-
-CREATE TABLE `ventas` (
-  `id` int(11) NOT NULL,
-  `total` decimal(10,2) NOT NULL,
-  `metodo_pago` enum('Efectivo','Visa','Yape','Plin') NOT NULL,
-  `fecha` date NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `ventas_detalles`
---
-
-CREATE TABLE `ventas_detalles` (
-  `id` int(11) NOT NULL,
-  `venta_id` int(11) NOT NULL,
-  `consumible_id` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL,
-  `precio_unitario` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `compras_consumibles`
---
-ALTER TABLE `compras_consumibles`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `consumible_id` (`consumible_id`);
-
---
--- Indices de la tabla `compras_normales`
---
-ALTER TABLE `compras_normales`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `consumibles`
---
-ALTER TABLE `consumibles`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `consumibles_categorias`
---
-ALTER TABLE `consumibles_categorias`
-  ADD PRIMARY KEY (`consumible_id`,`categoria_id`),
-  ADD KEY `categoria_id` (`categoria_id`);
-
---
--- Indices de la tabla `consumible_componentes`
---
-ALTER TABLE `consumible_componentes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_consumible` (`id_consumible`),
-  ADD KEY `id_componente` (`id_componente`);
-
---
--- Indices de la tabla `lotes`
---
-ALTER TABLE `lotes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `compras_consumibles_id` (`compras_consumibles_id`);
-
---
--- Indices de la tabla `ventas`
---
-ALTER TABLE `ventas`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `ventas_detalles`
---
-ALTER TABLE `ventas_detalles`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `compras_consumibles`
---
-ALTER TABLE `compras_consumibles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `compras_normales`
---
-ALTER TABLE `compras_normales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `consumibles`
---
-ALTER TABLE `consumibles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `consumible_componentes`
---
-ALTER TABLE `consumible_componentes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `lotes`
---
-ALTER TABLE `lotes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `ventas`
---
-ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `ventas_detalles`
---
-ALTER TABLE `ventas_detalles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `compras_consumibles`
---
-ALTER TABLE `compras_consumibles`
-  ADD CONSTRAINT `compras_consumibles_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `consumibles_categorias`
---
-ALTER TABLE `consumibles_categorias`
-  ADD CONSTRAINT `consumibles_categorias_ibfk_1` FOREIGN KEY (`consumible_id`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `consumibles_categorias_ibfk_2` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `consumible_componentes`
---
-ALTER TABLE `consumible_componentes`
-  ADD CONSTRAINT `fk_componente` FOREIGN KEY (`id_componente`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_consumible` FOREIGN KEY (`id_consumible`) REFERENCES `consumibles` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `lotes`
---
-ALTER TABLE `lotes`
-  ADD CONSTRAINT `lotes_ibfk_1` FOREIGN KEY (`compras_consumibles_id`) REFERENCES `compras_consumibles` (`id`) ON DELETE CASCADE;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

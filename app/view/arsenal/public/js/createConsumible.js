@@ -1,3 +1,205 @@
+$(document).ready(function() {
+    $('#addCategoriaBtn').on('click', function() {
+        const nuevaCategoria = $('#nuevaCategoria').val().trim().toUpperCase();
+
+        // Comprobar si la categoría ya existe en la tabla
+        let categoriaExistente = false;
+        $('.table-categorias tbody tr').each(function() {
+            const categoriaNombre = $(this).find('td').first().text().trim().toUpperCase();
+            if (categoriaNombre === nuevaCategoria) {
+                categoriaExistente = true;
+                return false; // Rompe el bucle
+            }
+        });
+
+        if (categoriaExistente) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Categoría existente',
+                text: 'Esta categoría ya está en la lista.',
+            });
+        } else if (nuevaCategoria) {
+            fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `nombre=${encodeURIComponent(nuevaCategoria)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reiniciar el campo de nueva categoría
+                    $('#nuevaCategoria').val('');
+
+                    // Agregar la nueva categoría a la tabla de categorías existentes
+                    $('.table-categorias tbody').append(`
+                        <tr>
+                            <td>${nuevaCategoria}</td>
+                            <td></td>
+                        </tr>
+                    `);
+
+                    // Agregar la nueva categoría al select
+                    $('#categoria').append(`
+                        <option value="${data.newId}">${nuevaCategoria}</option>
+                    `);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Categoría agregada!',
+                        text: 'La categoría se ha agregado exitosamente.',
+                        timer: 1000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un problema al agregar la categoría.'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un problema con la solicitud.'
+                });
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo vacío',
+                text: 'Por favor, ingresa el nombre de la categoría.'
+            });
+        }
+    });
+});
+$(document).ready(function() {
+    $('#addCategoriaBtn').on('click', function() {
+        const nuevaCategoria = $('#nuevaCategoria').val().trim().toUpperCase();
+
+        let categoriaExistente = false;
+        $('.table-categorias tbody tr').each(function() {
+            const categoriaNombre = $(this).find('td').first().text().trim().toUpperCase();
+            if (categoriaNombre === nuevaCategoria) {
+                categoriaExistente = true;
+                return false;
+            }
+        });
+
+        if (categoriaExistente) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Categoría existente',
+                text: 'Esta categoría ya está en la lista.',
+            });
+        } else if (nuevaCategoria) {
+            fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `nombre=${encodeURIComponent(nuevaCategoria)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    $('#nuevaCategoria').val('');
+                    $('.table-categorias tbody').append(`<tr><td>${nuevaCategoria}</td><td></td></tr>`);
+                    $('#categoria').append(`<option value="${data.newId}">${nuevaCategoria}</option>`);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Categoría agregada!',
+                        text: 'La categoría se ha agregado exitosamente.',
+                        timer: 1000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un problema al agregar la categoría.'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un problema con la solicitud.'
+                });
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo vacío',
+                text: 'Por favor, ingresa el nombre de la categoría.'
+            });
+        }
+    });
+
+    // Lógica para habilitar el formulario de lotes cuando se crea un consumible simple
+    $('#guardarConsumible').on('click', function() {
+        const esCompuesto = $('#consumible_multiple').is(':checked');
+
+        // Solo mostrar la sección de lotes si es un consumible simple
+        if (!esCompuesto) {
+            $('#loteSection').show();
+        }
+    });
+
+    $('#guardarLote').on('click', function() {
+        const cantidad = $('#cantidad').val();
+        const costoTotal = $('#costo_total').val();
+        const precioUnitario = $('#precio_unitario_lote').val();
+        const fechaIngreso = $('#fecha_ingreso').val();
+        const fechaVencimiento = $('#fecha_vencimiento_lote').val();
+
+        // Validación y envío de datos del lote
+        if (cantidad && costoTotal && precioUnitario && fechaIngreso && fechaVencimiento) {
+            fetch('/gestion/app/controller/ArsenalController.php?action=guardarLote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `cantidad=${cantidad}&costo_total=${costoTotal}&precio_unitario=${precioUnitario}&fecha_ingreso=${fechaIngreso}&fecha_vencimiento=${fechaVencimiento}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Lote guardado!',
+                        text: 'El lote se ha guardado exitosamente.',
+                        timer: 1000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un problema al guardar el lote.'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un problema con la solicitud.'
+                });
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos incompletos',
+                text: 'Por favor, llena todos los campos del lote.'
+            });
+        }
+    });
+});
+
+
 
 // CONTROL DEL CLICK QUE MANJE ALAS CATEGORIAS
 document.getElementById('categoriasContainer').addEventListener('click', function (event) {
@@ -256,55 +458,5 @@ $(document).ready(function () {
         ]
     });
 
-    $('#addCategoriaBtn').on('click', function () {
-        const nuevaCategoria = $('#nuevaCategoria').val();
-
-        if (nuevaCategoria) {
-            fetch('/gestion/app/controller/ArsenalController.php?action=addCategoria', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `nombre=${encodeURIComponent(nuevaCategoria)}`
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        $('#categoriaModal').modal('hide');
-                        $('body').removeClass('modal-open');
-                        $('.modal-backdrop').remove();
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Categoría agregada!',
-                            text: 'La categoría se ha agregado exitosamente.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-
-                        $('#nuevaCategoria').val('');
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Hubo un problema al agregar la categoría.'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un problema con la solicitud.'
-                    });
-                });
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Campo vacío',
-                text: 'Por favor, ingresa el nombre de la categoría.'
-            });
-        }
-    });
+    
 });

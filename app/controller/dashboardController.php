@@ -12,10 +12,8 @@ class DashboardController extends BaseController {
 
     public function showDashboard() {
         $nombre = $this->checkLogin();
-        $productosPorVencer = $this->model->obtenerProductosPorVencer();
         $this->loadView('dashboard.dashboard', [
-            'nombre' => $nombre,
-            'productosPorVencer' => $productosPorVencer
+            'nombre' => $nombre
         ]);
     }
 }
