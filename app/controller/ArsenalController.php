@@ -9,18 +9,25 @@ class ArsenalController extends BaseController
     {
         $this->model = new Arsenal();
     }
-    ////////////////////////////////////////////////SHOWS///////////////////////////////////////////////////
-    public function showArsenal()
-    {
-        $nombre = $this->checkLogin();
-        $bienes = $this->model->getBienes();
-        $consumibles = $this->model->getConsumibles();
-        $this->loadView('arsenal.showArsenal', [
-            'bienes' => $bienes,
-            'consumibles' => $consumibles,
-            'nombre' => $nombre
-        ]);
-    }
+    // ////////////////////////////////////////////////SHOWS///////////////////////////////////////////////////
+    // public function showArsenal() {
+    //     $nombre = $this->checkLogin();
+    //     $this->loadView('arsenal.arsenal', [
+    //         'nombre' => $nombre
+    //     ], [
+    //         '/gestion/public/css/datatables.css',  // Incluye el archivo CSS de DataTables
+    //         '/gestion/public/css/buttons.dataTables.min.css'
+    //     ], [
+    //         'https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js',
+    //         'https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js',
+    //         'https://cdn.datatables.net/buttons/1.6.2/js/buttons.flash.min.js',
+    //         'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js',
+    //         'https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js',
+    //         'https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js',
+    //         'https://cdn.jsdelivr.net/npm/sweetalert2@10'
+    //     ]);
+    // }
+    
     public function showBien()
     {
         $nombre = $this->checkLogin();
@@ -35,22 +42,30 @@ class ArsenalController extends BaseController
         $nombre = $this->checkLogin();
         $consumibles = $this->model->getConsumibles();
         $categorias = $this->model->getAllCategorias();
+    
+        // Pasamos los datos a la vista, junto con los scripts y estilos adicionales
         $this->loadView('arsenal.showConsumible', [
             'consumibles' => $consumibles,
             'categorias' => $categorias,
             'nombre' => $nombre
+        ], [
+           
+        ], [
+            '/gestion/app/view/arsenal/recursos/js/showConsumible.min.js'
         ]);
     }
-    public function showCreateConsumible()
-    {
-        $nombre = $this->checkLogin();
-        $categorias = $this->model->getAllCategorias();
+    
+    
+    // public function showCreateConsumible()
+    // {
+    //     $nombre = $this->checkLogin();
+    //     $categorias = $this->model->getAllCategorias();
 
-        $this->loadView('arsenal.createConsumible', [
-            'categorias' => $categorias,
-            'nombre' => $nombre
-        ]);
-    }
+    //     $this->loadView('arsenal.createConsumible', [
+    //         'categorias' => $categorias,
+    //         'nombre' => $nombre
+    //     ]);
+    // }
     public function showVentaConsumible()
     {
         $nombre = $this->checkLogin();
@@ -60,6 +75,10 @@ class ArsenalController extends BaseController
             'consumibles' => $consumibles,
             'categorias' => $categorias,
             'nombre' => $nombre
+        ], [
+           
+        ], [
+            '/gestion/app/view/arsenal/recursos/js/ventaConsumible.min.js'
         ]);
     }
     public function showVentasRegistradas()
@@ -73,6 +92,10 @@ class ArsenalController extends BaseController
             'ventas' => $ventas,
             'selectedDate' => $selectedDate,
             'nombre' => $nombre
+        ], [
+           
+        ], [
+            '/gestion/app/view/arsenal/recursos/js/showVentasRegistradas.min.js'
         ]);
     }
     ////////////////////////////////////////////////ALMACENES///////////////////////////////////////////////////
@@ -84,64 +107,88 @@ class ArsenalController extends BaseController
             $marca = isset($_POST['marca']) && !empty($_POST['marca']) ? $_POST['marca'] : 'S/D';
             $unidad_medida = $_POST['unidad_medida'];
             $observacion = $_POST['observacion'];
-            $precio = $_POST['precio'];
             $es_compuesto = isset($_POST['consumible_multiple']) ? 1 : 0;
-
+            $precio_sugerido = isset($_POST['precio_sugerido']) ? $_POST['precio_sugerido'] : 0;
+    
+            // Validar si es un consumible compuesto o simple
             if ($es_compuesto && isset($_POST['componentes'])) {
+                // Para consumibles compuestos, calcular el coste basado en los componentes
                 $coste = 0;
                 foreach ($_POST['componentes'] as $componenteId => $datosComponente) {
                     $cantidad = $datosComponente['cantidad'];
                     $costeComponente = $datosComponente['precio'] * $cantidad;
                     $coste += $costeComponente;
                 }
-                $stock = NULL; // Los compuestos no tienen stock propio
+                $stock = NULL; // Los consumibles compuestos no tienen stock propio
             } else {
+                // Consumible simple
                 $coste = $_POST['coste'];
                 $stock = $_POST['stock'];
+                $precio_unitario = $_POST['precio_unitario'];
             }
-
-            // Crear el consumible
+    
+            // Crear el consumible en la base de datos
             $consumibleId = $this->model->createConsumible(
                 $nombre,
                 $descripcion_consumible,
                 $marca,
                 $unidad_medida,
                 $observacion,
-                null, // no se utiliza fecha_compra
-                null, // no se utiliza fecha_vencimiento
-                $precio,
-                $stock,
-                $coste,
+                $precio_sugerido, // precio sugerido solo aplica a compuestos
                 $es_compuesto
             );
-
+    
             if ($consumibleId) {
-                // Asignar categorías
-                if (isset($_POST['categorias'])) {
-                    $this->model->assignCategoriasToConsumible($consumibleId, $_POST['categorias']);
-                }
-
-                // Añadir componentes si es compuesto
+    // Asignar la primera categoría al consumible directamente
+    if (isset($_POST['categorias']) && !empty($_POST['categorias'])) {
+        // Solo se toma la primera categoría seleccionada para asignarla al campo 'categoria_id'
+        $categoria_id = $_POST['categorias'][0];
+        $this->model->updateCategoriaForConsumible($consumibleId, $categoria_id);
+    }
+    
+                // Si es compuesto, añadir los componentes
                 if ($es_compuesto && isset($_POST['componentes'])) {
                     foreach ($_POST['componentes'] as $componenteId => $datosComponente) {
                         $cantidad = $datosComponente['cantidad'];
                         $this->model->addComponenteToConsumible($consumibleId, $componenteId, $cantidad);
                     }
                 } else {
-                    // Crear el lote para los consumibles simples
-                    // Utiliza las fechas de compra y vencimiento aquí
-                    $fecha_compra = $_POST['fecha_compra']; // Obtener la fecha de compra del formulario
-                    $fecha_vencimiento = $_POST['fecha_vencimiento']; // Obtener la fecha de vencimiento del formulario
+                    // Si es consumible simple, crear el lote con fechas de compra y vencimiento
+                    $fecha_ingreso = $_POST['fecha_ingreso']; // Fecha de ingreso obtenida del formulario
+                    $fecha_vencimiento = $_POST['fecha_vencimiento']; // Fecha de vencimiento obtenida del formulario
+                    $lote = uniqid('lote_'); 
+                    // Crear el lote para este consumible simple
+                    // Crear la compra en compras_consumibles
+                    $compraConsumibleId = $this->model->createCompraConsumible(
+                        $consumibleId,    // ID del consumible creado
+                        $stock,           // Cantidad de productos
+                        $precio_unitario, // Costo unitario
+                        $coste,           // Costo total
+                        $fecha_ingreso,   // Fecha de ingreso
+                        $fecha_vencimiento // Fecha de vencimiento
+                    );
 
-                    $this->model->createLote($consumibleId, $stock, $coste / $stock, $precio, $fecha_compra, $fecha_vencimiento);
+                    // Crear el lote para este consumible simple, usando el ID de la compra recién creada
+                    $this->model->createLote(
+                        $compraConsumibleId, // compras_consumibles_id
+                        $lote,               // Identificador único para el lote
+                        $stock,              // Cantidad
+                        $coste,              // Costo total
+                        $precio_unitario,    // Precio unitario definido en el formulario
+                        $fecha_ingreso,      // Fecha de ingreso
+                        $fecha_vencimiento   // Fecha de vencimiento
+                    );
+
                 }
-
+    
+                // Redirigir después de crear el consumible
                 header('Location: /gestion/app/controller/ArsenalController.php?action=showConsumible');
                 exit;
             } else {
                 echo "Error al crear consumible.";
             }
         } else {
+            // Mostrar el formulario
             $categorias = $this->model->getAllCategorias();
             $consumibles = $this->model->getAllConsumibles();
             $this->loadView('arsenal.createConsumible', [
@@ -150,6 +197,9 @@ class ArsenalController extends BaseController
             ]);
         }
     }
+    
+
+
 
 
 

@@ -21,8 +21,11 @@ class DashboardController extends BaseController {
 if (isset($_GET['action'])) {
     $controller = new DashboardController();
     $action = $_GET['action'];
+
     if (method_exists($controller, $action)) {
         $controller->$action();
+    } else {
         echo "Error: Acción no encontrada.";
     }
 }
+?>

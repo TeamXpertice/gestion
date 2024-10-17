@@ -10,14 +10,18 @@ class BaseController {
         return $_SESSION['nombres'];
     }
 
-    protected function loadView($view, $data = []) {
-        extract($data);
-        include __DIR__ . '/../view/templates/header.php';
+    // El método `loadView` acepta parámetros adicionales para CSS, JS y el título
+    protected function loadView($view, $data = [], $additionalCss = [], $additionalJs = [], $title = 'Sistema') {
+        extract($data); // Extrae las variables de $data para ser usadas en las vistas
+
+        // Ruta a la vista que queremos cargar
         $viewPath = __DIR__ . '/../view/' . str_replace('.', '/', $view) . '.php';
-        include $viewPath;
-        include __DIR__ . '/../view/templates/footer.php';
+
+        // Incluimos el layout principal, que se encargará de cargar el header, footer y la vista
+        include __DIR__ . '/../view/templates/layout.php';
     }
 }
+
 
 
 ?>

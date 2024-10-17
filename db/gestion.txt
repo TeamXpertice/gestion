@@ -64,7 +64,7 @@ CREATE TABLE lotes (
     compras_consumibles_id INT(11) NOT NULL,
     lote VARCHAR(255) NOT NULL,
     cantidad INT(11) NOT NULL,
-    costo_unitario DECIMAL(10,2) NOT NULL,
+    costo_total DECIMAL(10,2) NOT NULL,
     precio_unitario DECIMAL(10,2) NOT NULL,
     fecha_ingreso DATE NOT NULL,
     fecha_vencimiento DATE NOT NULL,

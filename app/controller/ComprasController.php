@@ -18,6 +18,10 @@ class ComprasController extends BaseController {
             'compras' => $compras,
             'selectedDate' => $date,
             'nombre' => $nombre
+        ], [
+           
+        ], [
+            '/gestion/app/view/compras/recursos/js/comprasRegistradas.min.js'
         ]);
     }
 
@@ -28,6 +32,10 @@ class ComprasController extends BaseController {
         $this->loadView('compras.createCompra', [
             'nombre' => $nombre,
             'categorias' => $categorias 
+        ], [
+           
+        ], [
+            '/gestion/app/view/compras/recursos/js/createCompra.min.js'
         ]);
     }
 
