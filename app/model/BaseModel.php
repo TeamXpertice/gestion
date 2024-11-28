@@ -9,8 +9,8 @@ class BaseModel
         date_default_timezone_set('America/Lima');
         $host = 'localhost';
         $dbname = 'gestion';
-        $username = 'gestionCowark';
-        $password = 'gestionCowark';
+        $username = '';
+        $password = '';
 
         try {
             $this->db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
