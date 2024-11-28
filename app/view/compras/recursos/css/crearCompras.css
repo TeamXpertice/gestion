@@ -1,0 +1,54 @@
+.category-grid {
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    justify-content: flex-start; 
+}
+
+.category-button {
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: white;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    background-color: gray;
+}
+
+.category-button:hover {
+    opacity: 0.8;
+}
+
+.category-red {
+    background-color: #e74c3c;
+}
+
+.category-blue {
+    background-color: #3498db;
+}
+
+.category-green {
+    background-color: #2ecc71;
+}
+
+.category-orange {
+    background-color: #e67e22;
+}
+
+.category-purple {
+    background-color: #9b59b6;
+}
+
+.category-teal {
+    background-color: #1abc9c;
+}
+
+.category-yellow {
+    background-color: #f1c40f;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}

@@ -1,3 +1,4 @@
 <?php
-    require('Controllers/C_verUsuarios.php');
+header('Location: app/view/login/login.php');
+exit();
 ?>

@@ -1,0 +1,159 @@
+[21-Nov-2024 16:55:55 UTC] PHP Warning:  require_once(/home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/../model/Bien.php): Failed to open stream: No such file or directory in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/BienController.php on line 3
+[21-Nov-2024 16:55:55 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/../model/Bien.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/BienController.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/BienController.php on line 3
+[21-Nov-2024 16:57:11 UTC] PHP Warning:  require_once(/home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/../model/Bien.php): Failed to open stream: No such file or directory in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/BienController.php on line 3
+[21-Nov-2024 16:57:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/../model/Bien.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/BienController.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/BienController.php on line 3
+[21-Nov-2024 12:09:44 America/Lima] PHP Fatal error:  Uncaught Error: Call to undefined method AdministradorController::validarCorreoODni() in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php:117
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php on line 117
+[21-Nov-2024 12:09:47 America/Lima] PHP Fatal error:  Uncaught Error: Call to undefined method AdministradorController::validarCorreoODni() in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php:117
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php on line 117
+[21-Nov-2024 12:13:08 America/Lima] Componentes recibidos: Array
+(
+    [1] => Array
+        (
+            [id] => 1
+            [nombre] => INKA COLA
+            [cantidad] => 2
+            [precio] => 5
+            [lotes] => Array
+                (
+                    [0] => Array
+                        (
+                            [stock] => 8
+                        )
+
+                )
+
+        )
+
+)
+
+[21-Nov-2024 12:14:15 America/Lima] Array
+(
+    [0] => Array
+        (
+            [id] => 1
+            [nombre] => INKA COLA
+            [stock] => 8
+            [precio] => 5.00
+            [fecha_vencimiento] => 2024-12-11
+            [es_compuesto] => 0
+        )
+
+    [1] => Array
+        (
+            [id] => 2
+            [nombre] => GASEOSAS+2
+            [stock] => 
+            [precio] => 8.00
+            [fecha_vencimiento] => 
+            [es_compuesto] => 1
+            [cantidad_maxima] => 4
+        )
+
+)
+
+[21-Nov-2024 12:14:57 America/Lima] No hay suficiente stock para el producto con ID: 1.
+[21-Nov-2024 12:14:57 America/Lima] Error al registrar la venta.
+[21-Nov-2024 12:15:34 America/Lima] Venta: {"venta_id":2,"nombre_consumible":"INKA COLA","categoria":"GASEOSAS","cantidad_total":4,"total":"36.00","fecha":"2024-11-21","metodo_pago":"Yape"}
+[21-Nov-2024 12:15:34 America/Lima] Venta: {"venta_id":2,"nombre_consumible":"GASEOSAS+2","categoria":"GASEOSAS","cantidad_total":2,"total":"36.00","fecha":"2024-11-21","metodo_pago":"Yape"}
+[21-Nov-2024 12:21:51 America/Lima] Insertando compra para consumible ID 1 con cantidad: 6, costo total: 18, precio unitario: 3.5
+[21-Nov-2024 12:23:16 America/Lima] Insertando compra para consumible ID 1 con cantidad: 6, costo total: 18, precio unitario: 3.5
+[21-Nov-2024 12:23:40 America/Lima] Array
+(
+    [0] => Array
+        (
+            [id] => 1
+            [nombre] => INKA COLA
+            [stock] => 6
+            [precio] => 3.50
+            [fecha_vencimiento] => 2024-12-25
+            [es_compuesto] => 0
+        )
+
+    [1] => Array
+        (
+            [id] => 1
+            [nombre] => INKA COLA
+            [stock] => 6
+            [precio] => 3.50
+            [fecha_vencimiento] => 2025-02-06
+            [es_compuesto] => 0
+        )
+
+    [2] => Array
+        (
+            [id] => 2
+            [nombre] => GASEOSAS+2
+            [stock] => 
+            [precio] => 8.00
+            [fecha_vencimiento] => 
+            [es_compuesto] => 1
+            [cantidad_maxima] => 6
+        )
+
+)
+
+[21-Nov-2024 12:25:31 America/Lima] No hay suficiente stock para el producto con ID: 1.
+[21-Nov-2024 12:25:31 America/Lima] Error al registrar la venta.
+[21-Nov-2024 12:25:53 America/Lima] Array
+(
+    [0] => Array
+        (
+            [id] => 2
+            [nombre] => GASEOSAS+2
+            [stock] => 
+            [precio] => 8.00
+            [fecha_vencimiento] => 
+            [es_compuesto] => 1
+            [cantidad_maxima] => 0
+        )
+
+)
+
+[21-Nov-2024 12:28:52 America/Lima] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'gestion.categorias' doesn't exist in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/ArsenalVenta.php:11
+Stack trace:
+#0 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/ArsenalVenta.php(11): PDOStatement->execute()
+#1 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/ArsenalVentaController.php(17): ArsenalVenta->getCategorias()
+#2 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/ArsenalVentaController.php(97): ArsenalVentaController->showVentaConsumible()
+#3 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/ArsenalVenta.php on line 11
+[21-Nov-2024 12:28:58 America/Lima] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'gestion.compras_normales' doesn't exist in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/Compras.php:19
+Stack trace:
+#0 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/Compras.php(19): PDOStatement->execute()
+#1 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/ComprasController.php(26): Compras->getComprasNormalesByDate()
+#2 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/ComprasController.php(136): ComprasController->showRegistroCompras()
+#3 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/Compras.php on line 19
+[21-Nov-2024 12:29:12 America/Lima] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'gestion.administradores' doesn't exist in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/Login.php:10
+Stack trace:
+#0 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/Login.php(10): PDOStatement->execute()
+#1 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/LoginController.php(13): Login->authenticate()
+#2 /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/LoginController.php(33): LoginController->Login()
+#3 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/model/Login.php on line 10
+[23-Nov-2024 14:50:57 America/Lima] PHP Fatal error:  Uncaught Error: Call to undefined method AdministradorController::validarCorreoODni() in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php:117
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php on line 117
+[23-Nov-2024 14:51:05 America/Lima] PHP Fatal error:  Uncaught Error: Call to undefined method AdministradorController::validarCorreoODni() in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php:117
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php on line 117
+[23-Nov-2024 14:51:23 America/Lima] PHP Fatal error:  Uncaught Error: Call to undefined method AdministradorController::validarCorreoODni() in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php:117
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php on line 117
+[23-Nov-2024 14:51:32 America/Lima] PHP Fatal error:  Uncaught Error: Call to undefined method AdministradorController::validarCorreoODni() in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php:117
+Stack trace:
+#0 {main}
+  thrown in /home/llcb5sc8a5or/public_html/xpertice.pe/gestion/app/controller/AdministradorController.php on line 117

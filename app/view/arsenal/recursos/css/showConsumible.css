@@ -1,0 +1,190 @@
+#tablaConsumiblesSimples {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #dcdcdc;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    background-color: #64656a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tablaConsumiblesSimples thead {
+    background: #124072;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+#tablaConsumiblesSimples thead th {
+    padding: 10px 0px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#tablaConsumiblesSimples tbody td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+#tablaConsumiblesSimples tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+#tablaConsumiblesSimples tbody tr:hover {
+    background-color: #124072;
+    color: #ffffff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --------------------------------*/
+
+#tablaCompuestos {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #dcdcdc;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    background-color: #64656a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tablaCompuestos thead {
+    background: #124072;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+#tablaCompuestos thead th {
+    padding: 10px 0px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#tablaCompuestos tbody td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+#tablaCompuestos tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+#tablaCompuestos tbody tr:hover {
+    background-color: #124072;
+    color: #ffffff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dt-buttons .dt-button {
+    background: #64656a;
+    color: #fffefe;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.dt-buttons .dt-button:hover {
+    background-color: #124072;
+    color: #000000;
+    transition: all 0.3s ease-in-out;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background-color: #fff;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    margin: 2px;
+    border-radius: 5px;
+}
+
+.modal,
+.modal-backdrop {
+    opacity: 1;
+}
+
+#consumiblesList div {
+    display: flex;
+    align-items: center;
+}
+
+#consumiblesList input[type="number"] {
+    width: 60px;
+    margin-left: 10px;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #000000;
+    border-radius: 4px;
+    outline: none;
+    padding: 4px;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+/* Estilos generales para los botones */
+.btn {
+
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    opacity: 0.8;
+    background-color: #dee2e6;
+    color: black;
+    border: 0.5px solid black;
+}
+
+.btn-red {
+    background-color: #ff4d4d;
+}
+
+.btn-blue {
+    background-color: #4d90fe;
+}
+
+.btn-green {
+    background-color: #4CAF50;
+}
+
+.btn-orange {
+    background-color: #ff9800;
+}
+
+.btn-purple {
+    background-color: #9c27b0;
+}
+
+.btn-teal {
+    background-color: #008080;
+}
+
+.btn-yellow {
+    background-color: #ffeb3b;
+}
+
+.btn-excel i, .btn-print i {
+margin-right: 5px;  
+font-size: 16px;  
+}
+
+.btn-excel i {
+color: #4CAF50; 
+}
+
+.btn-print i {
+color: #2196F3; 
+}
